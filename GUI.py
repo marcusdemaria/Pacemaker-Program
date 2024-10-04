@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import font
 from tkinter import messagebox
 import os
 from matplotlib.figure import Figure
@@ -86,16 +87,14 @@ def open_login_window():
     tk.Label(login_window, text="Username:").pack(pady=5)
     entry_username = tk.Entry(login_window)
     entry_username.pack(pady=5)
+    
 
     # Password input
     tk.Label(login_window, text="Password:").pack(pady=5)
     entry_password = tk.Entry(login_window, show="*")
     entry_password.pack(pady=5)
 
-    # Buttons for login and new user creation
-    tk.Button(login_window, text="Login", command=lambda: login(entry_username.get(), entry_password.get(), login_window)).pack(pady=10)
-    tk.Button(login_window, text="Create New User", command=open_create_user_window).pack(pady=5)
-
+    
 # Main application window
 root = tk.Tk()
 
@@ -123,17 +122,22 @@ exit_button.grid(row=0, column=3, sticky='ne', padx=10, pady=10)  # Adjusted col
 logout_button = tk.Button(root, text="LogOut", command=lambda: [root.withdraw(), open_login_window()], width=15, height=4)
 logout_button.grid(row=1, column=3, sticky='ne', padx=10, pady=0)  # Adjusted column
 
-options = ["Option 1", "Option 2", "Option 3", "Option 4"]
+options = ["AOO", "VOO", "AAI", "VVI"]
 selected_option = tk.StringVar()
 selected_option.set(options[0])  # Set default value
 
-label = tk.Label(root, text="Selected option: Option 1")
+label = tk.Label(root, text="Selected option: AOO")
 label.grid(row=1, column=2, sticky='sw', pady=10)  # Adjusted row
 
 def update_label(option):
     label.config(text=f"Selected option: {option}")
 
+
+# Create a larger font for the dropdown menu
+large_font = font.Font(size=14)
+
 dropdown = tk.OptionMenu(root, selected_option, *options, command=update_label)
+dropdown.config(font=large_font)
 dropdown.grid(row=0, column=0, columnspan=2, sticky='nw', pady=20, padx=20)  # Adjusted row
 
 # Create a figure for the graph
