@@ -1,21 +1,27 @@
 import customtkinter as ctk
 import tkinter as tk
-from tkinter import PhotoImage
+
 import os
 from PIL import Image, ImageTk
 
-USER_DATA_FILE = "users.txt"
+# for plotting
+from matplotlib.figure import Figure
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+USER_DATA_FILE = "users.txt" # Path to store the users' information
+
+# function to clear current entry fields
 def clear_entries(entry):
     entry.delete(0, 'end')
-        
+
+# function to clear the current page deleting widgits       
 def clear_page():
     for widget in root.winfo_children(): #Loops through all widgets and destroys them 
         widget.destroy()
 
-
+#function to read users from file
 def read_users():
-    if not os.path.exists(USER_DATA_FILE): #need explination for why this works
+    if not os.path.exists(USER_DATA_FILE): #if the file does not exist return an empty dictionary
         return{}
 
     with open(USER_DATA_FILE, "r") as file:
@@ -64,7 +70,7 @@ def create_new_user(create_user_error_label, new_username_entry, new_password_en
         root.after(100,lambda: create_user_error_label.configure(text="Error: Usernames and passwords cannot contain spaces or colons..", fg_color="red"))
         clear_entries(new_username_entry)
         clear_entries(new_password_entry)
-    elif "" in new_username or "" in new_password:
+    elif "" == new_username or "" == new_password:
         create_user_error_label.configure(text="", fg_color="transparent")
         root.after(100,lambda: create_user_error_label.configure(text="Must create both a username and password", fg_color="red"))
         clear_entries(new_username_entry)
@@ -95,10 +101,10 @@ def open_create_user_page():
     create_user_error_label = ctk.CTkLabel(root, text="", fg_color="transparent")  # Initially empty
     create_user_error_label.pack(pady=5)
 
-    create_user_button = ctk.CTkButton(root, text="Create User", command= lambda: create_new_user(create_user_error_label,new_username_entry, new_password_entry))
+    create_user_button = ctk.CTkButton(root, text="Create User", command= lambda: create_new_user(create_user_error_label, new_username_entry, new_password_entry))
     create_user_button.pack(pady=20)
     root.unbind('<Return>')
-    root.bind('<Return>', lambda event: create_new_user(create_user_error_label,new_username_entry, new_password_entry))
+    root.bind('<Return>', lambda event: create_new_user(create_user_error_label, new_username_entry, new_password_entry))
 
     back_button = ctk.CTkButton(root, text="Back", command=open_login_page)
     back_button.pack(pady=10)
@@ -182,6 +188,12 @@ def open_main_page():
 
     root.title("Main Page")
 
+    #Setting up the Gird Layout
+    root.columnconfigure((0,1,2,3,4,5,6), weight=2)
+    root.columnconfigure((7,8), weight=1)
+    root.rowconfigure(0, weight=1)
+    root.rowconfigure((1,2,3,4,5), weight=2)
+
     # Main page widgets
     pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"]
     initial_state = tk.StringVar(value="AOO")
@@ -190,12 +202,12 @@ def open_main_page():
 
 
     logout_button = ctk.CTkButton(root, text="Logout", command=open_login_page)
-    logout_button.grid(row=0, column=3, sticky="nsew", pady=10, padx=10)
-    exit_button = ctk.CTkButton(root, text="Exit", command=root.destroy, fg_color="red")
-    exit_button.grid(row=0, column=4, sticky="nsew", pady=10, padx=10)
+    logout_button.grid(row=0, column=7, sticky="new", pady=10, padx=(10,1))
+    exit_button = ctk.CTkButton(root, text="Exit", command=root.destroy, fg_color="red", hover_color="#bd1809")
+    exit_button.grid(row=0, column=8, sticky="new", pady=10, padx=(1,10))
 
     frame = ctk.CTkScrollableFrame(master=root, width=200, height=400)
-    frame.grid(row=1, column=0, rowspan=5, sticky="nsew", pady=10, padx=10)
+    frame.grid(row=1, column=0, rowspan=4, sticky="nsew", pady=10, padx=10)
 
     lower_limit= "60bpm"
     variables = {
@@ -209,12 +221,22 @@ def open_main_page():
     for input_text in variables:
         input = ctk.CTkLabel(frame, text=input_text)
         input.pack(pady=2, padx=2, anchor="w")
+
+    # Create a figure and a canvas for the plot
+    fig = Figure(figsize=(1,2), dpi=200)
+    ax = fig.add_subplot(111)
+    ax.plot([1, 2, 3, 4], [1, 4, 2, 3])  # Example plot
+
+    # Embed the figure in a tkinter canvas
+    canvas = FigureCanvasTkAgg(fig, master=root)
+    canvas.draw()
+    canvas.get_tk_widget().grid(row=2, column=3, rowspan=3, columnspan=6, sticky='nesw', padx=10, pady=10)
     
 
 
 root = tk.Tk()
-open_login_page() 
-#open_main_page() # for testing purposes
+#open_login_page() 
+open_main_page() # for testing purposes
 root.attributes('-fullscreen', True)  # Set the window to fullscreen mode
 
 # Bind the Escape key to exit fullscreen mode
