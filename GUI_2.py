@@ -211,10 +211,14 @@ def open_main_page():
 
     lower_limit= "60bpm"
     variables = {
-        (f"Lower Rate Limit: {lower_limit}"),
-        ("Upper Rate Limit: 120 bpm"),
+        (f"Lower Rate Limit (LRL): {lower_limit}"),
+        ("Upper Rate Limit (URL): 120 bpm"),
         ("Atrial Amplitude: 3.5V"),
+        ("Atrial Pulse Width: 0.4ms"),
+        ("Ventricular Pulse Width: 0.4ms"),
         ("Ventricular Amplitude: 2.8V"),
+        ("Ventricular Refractory Period: 320ms"),
+        ("Atrial Refractory Period: 250ms"),
         ("Mode: AOO")
     }
 
