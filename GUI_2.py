@@ -188,7 +188,7 @@ def open_main_page():
 
     root.title("Main Page")
 
-    #Setting up the Gird Layout
+    # Setting up the Grid Layout
     root.columnconfigure((0,1,2,3,4,5,6), weight=2)
     root.columnconfigure((7,8), weight=1)
     root.rowconfigure(0, weight=1)
