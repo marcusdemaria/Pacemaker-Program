@@ -28,42 +28,53 @@ class UserManager:
 
 
 class LoginPage:
-    def __init__(self, master, user_manager, app):
+    def __init__(self, master, user_manager, app):  # Added app argument
         self.master = master
         self.user_manager = user_manager
-        self.app = app
+        self.app = app  # Store the app reference
         self.create_widgets()
-    
+
     def create_widgets(self):
+        # Create a frame to contain the login form
         container_frame = ctk.CTkFrame(self.master)
         container_frame.pack(fill="both", expand=True)
 
+        # Configure grid for the container_frame to manage resizing
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.rowconfigure(0, weight=1)
+        container_frame.rowconfigure(1, weight=1)
+        container_frame.rowconfigure(2, weight=1)
+        container_frame.rowconfigure(3, weight=1)
+        container_frame.rowconfigure(4, weight=1)
+
+        # Center Frame for the login form
         center_frame = ctk.CTkFrame(container_frame)
-        center_frame.pack(side="left", fill="both", expand=True)
+        center_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
-        login_label = ctk.CTkLabel(center_frame, text="Welcome to the LeTron James PACEMAKER Login Page!!", font=("Arial", 20))
-        login_label.pack(pady=(20, 10))
+        # Resize and increase font size for labels, entry, and buttons
+        login_label = ctk.CTkLabel(center_frame, text="Welcome to the LeTron James PACEMAKER Login Page!!", font=("Arial", 24))
+        login_label.pack(pady=(20, 10), padx=10, fill="both")
 
-        username_label = ctk.CTkLabel(center_frame, text="Username:")
+        username_label = ctk.CTkLabel(center_frame, text="Username:", font=("Arial", 18))
         username_label.pack(pady=(5, 2))
 
-        self.username_entry = ctk.CTkEntry(center_frame)
-        self.username_entry.pack(pady=5)
+        self.username_entry = ctk.CTkEntry(center_frame, height=40, width=300, font=("Arial", 18))  # Increased height and width
+        self.username_entry.pack(pady=10)
 
-        password_label = ctk.CTkLabel(center_frame, text="Password:")
+        password_label = ctk.CTkLabel(center_frame, text="Password:", font=("Arial", 18))
         password_label.pack(pady=(5, 2))
 
-        self.password_entry = ctk.CTkEntry(center_frame, show="*")
-        self.password_entry.pack(pady=5)
+        self.password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))  # Increased height and width
+        self.password_entry.pack(pady=10)
 
-        self.login_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent")
+        self.login_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
         self.login_error_label.pack(pady=(5, 2))
 
-        login_button = ctk.CTkButton(center_frame, text="Login", command=self.handle_login)
-        login_button.pack(pady=(10, 5))
+        login_button = ctk.CTkButton(center_frame, text="Login", command=self.handle_login, height=50, width=300, font=("Arial", 18))  # Adjusted size
+        login_button.pack(pady=(20, 10))
 
-        create_user_button = ctk.CTkButton(center_frame, text="Create New User", command=self.open_create_user_page)
-        create_user_button.pack(pady=(5, 10))
+        create_user_button = ctk.CTkButton(center_frame, text="Create New User", command=self.open_create_user_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
+        create_user_button.pack(pady=(10, 20))
 
     def handle_login(self):
         username = self.username_entry.get()
@@ -75,15 +86,14 @@ class LoginPage:
         self.login_error_label.configure(text="")
 
         if username in users and users[username] == password:
-            self.app.open_main_page()
+            self.app.open_main_page()  # Correct reference to the app's method
         else:
             self.login_error_label.configure(text="Incorrect username or password.", fg_color="red")
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
 
     def open_create_user_page(self):
-        self.app.open_create_user_page()
-
+        self.app.open_create_user_page()  # Correct reference to the app's method
 
 class CreateUserPage:
     def __init__(self, master, user_manager, app):
@@ -93,27 +103,52 @@ class CreateUserPage:
         self.create_widgets()
 
     def create_widgets(self):
-        self.master.title("Create New User")
-        new_username_label = ctk.CTkLabel(self.master, text="New Username:")
-        new_username_label.pack(pady=5)
+        # Create a frame that will fill the window screen
+        container_frame = ctk.CTkFrame(self.master)
+        container_frame.pack(fill="both", expand=True)
 
-        self.new_username_entry = ctk.CTkEntry(self.master)
-        self.new_username_entry.pack(pady=5)
+        # Configure grid for resizing
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.rowconfigure(0, weight=1)
+        container_frame.rowconfigure(1, weight=1)
+        container_frame.rowconfigure(2, weight=1)
+        container_frame.rowconfigure(3, weight=1)
+        container_frame.rowconfigure(4, weight=1)
+        container_frame.rowconfigure(5, weight=1)
 
-        new_password_label = ctk.CTkLabel(self.master, text="New Password:")
-        new_password_label.pack(pady=5)
+        # Center Frame to contain the create user form
+        center_frame = ctk.CTkFrame(container_frame)
+        center_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
 
-        self.new_password_entry = ctk.CTkEntry(self.master, show="*")
-        self.new_password_entry.pack(pady=5)
+        # Label for the create user page
+        create_user_label = ctk.CTkLabel(center_frame, text="Create a New User", font=("Arial", 24))
+        create_user_label.pack(pady=(20, 10), padx=10, fill="both")
 
-        self.create_user_error_label = ctk.CTkLabel(self.master, text="", fg_color="transparent")
-        self.create_user_error_label.pack(pady=5)
+        # New Username label and entry
+        new_username_label = ctk.CTkLabel(center_frame, text="New Username:", font=("Arial", 18))
+        new_username_label.pack(pady=(5, 2))
 
-        create_user_button = ctk.CTkButton(self.master, text="Create User", command=self.handle_create_user)
-        create_user_button.pack(pady=20)
+        self.new_username_entry = ctk.CTkEntry(center_frame, height=40, width=300, font=("Arial", 18))  # Increased size
+        self.new_username_entry.pack(pady=10)
 
-        back_button = ctk.CTkButton(self.master, text="Back", command=self.app.open_login_page)
-        back_button.pack(pady=10)
+        # New Password label and entry
+        new_password_label = ctk.CTkLabel(center_frame, text="New Password:", font=("Arial", 18))
+        new_password_label.pack(pady=(5, 2))
+
+        self.new_password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))  # Increased size
+        self.new_password_entry.pack(pady=10)
+
+        # Label for error messages
+        self.create_user_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
+        self.create_user_error_label.pack(pady=(5, 2))
+
+        # Create User button
+        create_user_button = ctk.CTkButton(center_frame, text="Create User", command=self.handle_create_user, height=50, width=300, font=("Arial", 18))  # Adjusted size
+        create_user_button.pack(pady=(20, 10))
+
+        # Back button
+        back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_login_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
+        back_button.pack(pady=(10, 20))
 
     def handle_create_user(self):
         new_username = self.new_username_entry.get()
@@ -137,7 +172,6 @@ class CreateUserPage:
         self.create_user_error_label.configure(text=message, fg_color="red")
         self.new_username_entry.delete(0, tk.END)
         self.new_password_entry.delete(0, tk.END)
-
 
 class MainPage:
     def __init__(self, master, app):
