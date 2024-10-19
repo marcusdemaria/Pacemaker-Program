@@ -86,6 +86,9 @@ class LoginPage:
         login_button = ctk.CTkButton(center_frame, text="Login", command=self.handle_login, height=50, width=300, font=("Arial", 18))  # Adjusted size
         login_button.pack(pady=(20, 10))
 
+        self.master.unbind("<Return>")
+        self.master.bind("<Return>", lambda event: self.handle_login())
+
         create_user_button = ctk.CTkButton(center_frame, text="Create New User", command=self.open_create_user_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         create_user_button.pack(pady=(10, 20))
 
