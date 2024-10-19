@@ -10,7 +10,6 @@ from PIL import Image, ImageTk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from datetime import datetime
-import colours
 
 USER_DATA_FILE = "users.txt"
 
@@ -84,6 +83,9 @@ class LoginPage:
         login_button = ctk.CTkButton(center_frame, text="Login", command=self.handle_login, height=50, width=300, font=("Arial", 18))  # Adjusted size
         login_button.pack(pady=(20, 10))
 
+        self.master.unbind("<Return>")
+        self.master.bind("<Return>", lambda event: self.handle_login())
+
         create_user_button = ctk.CTkButton(center_frame, text="Create New User", command=self.open_create_user_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         create_user_button.pack(pady=(10, 20))
 
@@ -102,7 +104,8 @@ class LoginPage:
         if username in users and users[username] == password:
             self.app.open_main_page(username)  # Pass the username to open_main_page, and open the main page
         else:
-            self.login_error_label.configure(text="Incorrect username or password.", fg_color="red")
+            self.login_error_label.configure(text="", fg_color="transparent")
+            self.master.after(100, lambda: self.login_error_label.configure(text="Incorrect username or password.", fg_color="red"))
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
 
@@ -160,6 +163,9 @@ class CreateUserPage:
         create_user_button = ctk.CTkButton(center_frame, text="Create User", command=self.handle_create_user, height=50, width=300, font=("Arial", 18))  # Adjusted size
         create_user_button.pack(pady=(20, 10))
 
+        self.master.unbind("<Return>")
+        self.master.bind("<Return>", lambda event: self.handle_create_user())
+
         # Back button
         back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_login_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         back_button.pack(pady=(10, 20))
@@ -187,7 +193,8 @@ class CreateUserPage:
             self.app.open_login_page(success_message=True)  # Show success message on login page
 
     def show_error(self, message):
-        self.create_user_error_label.configure(text=message, fg_color="red")
+        self.create_user_error_label.configure(text="", fg_color="transparent")
+        self.master.after(100, lambda: self.create_user_error_label.configure(text=message, fg_color="red"))
         self.new_username_entry.delete(0, tk.END)
         self.new_password_entry.delete(0, tk.END)
 
@@ -197,11 +204,38 @@ class MainPage:
         self.app = app
         self.username = username
         self.create_widgets()
+        
         self.y_values = deque([0] * 30, maxlen=30)  # Start with 30 zeros
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values in milliseconds
+
+        # Create a figure and axis for the plot
         self.fig = Figure(figsize=(5, 4), dpi=100)  # Adjust size for better visibility
         self.ax = self.fig.add_subplot(111)
+
+        # Label the graph
+        self.ax.set_title("Electrogram")  # Set the title of the plot
+        self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
+        self.ax.set_ylabel("Amplitude (V)")  # Label for the y-axis
+
         self.line, = self.ax.plot(self.x_values, self.y_values)
+
+        # Initialize the electrogram frame and canvas
+        self.electrogram_frame = ctk.CTkFrame(self.master)
+        self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+
+        # Create the canvas for the plot
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
+        
+        # Center the canvas in the frame with padding
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
+
+        # Configure grid for the electrogram frame to allow for padding
+        self.electrogram_frame.columnconfigure(0, weight=1)
+        self.electrogram_frame.rowconfigure(0, weight=1)
+
+        # Initialize by hiding the electrogram frame
+        self.electrogram_frame.grid_forget()
+        self.show_edit_frame()
 
     def create_widgets(self):
         # Setting up the Grid Layout
@@ -222,7 +256,7 @@ class MainPage:
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"]
         self.initial_state = tk.StringVar(value="AOO")
         pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state)
-        pacemaker_state_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nw", pady=2, padx=2)
+        pacemaker_state_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nwe", pady=2, padx=2)
 
         # Segmented Button for Show Electrogram and Edit Parameters
         self.segmented_button = ctk.CTkSegmentedButton(self.master, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
@@ -241,17 +275,8 @@ class MainPage:
         exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
         exit_button.grid(row=0, column=3, sticky="new", pady=10, padx=(1, 10))
         
-        # Frame for graph
-        self.electrogram_frame = ctk.CTkFrame(self.master)
-        
         # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(self.master)
-
-        # Initialize by hiding both frames
-        self.electrogram_frame.grid_forget()
-        self.edit_frame.grid_forget()
-
-        self.show_edit_frame()
 
     def reset_plot(self):
         self.y_values.clear()  # Clear existing y-values
@@ -283,19 +308,12 @@ class MainPage:
 
         # Display electrogram frame with the plot
         self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
-        
-        # Embed the figure in a tkinter canvas
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nesw', padx=10, pady=10)
-        self.electrogram_frame.columnconfigure(0, weight=1)  # Allow the column to expand
-        self.electrogram_frame.rowconfigure(0, weight=1)     # Allow the row to expand
-
         self.update_plot()
 
     def show_edit_frame(self):
         # Hide electrogram frame and show edit frame
         self.electrogram_frame.grid_forget()
-        
+
         self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # Clear existing widgets in the edit frame before adding new ones (optional)
@@ -315,8 +333,8 @@ class MainPage:
         ]
 
         for input_text in variables:
-            input_label = ctk.CTkLabel(self.edit_frame, text=input_text)  # Use self.edit_frame
-            input_label.pack(pady=2, padx=2, anchor="w")  # Pack labels in the edit frame
+            input_label = ctk.CTkLabel(self.edit_frame, text=input_text)
+            input_label.pack(pady=2, padx=2, anchor="w")
 
     def update_plot(self):
         # Generate a new random y-value
@@ -342,7 +360,7 @@ class MainPage:
 
         # Schedule the next update after 200 ms
         self.master.after(200, self.update_plot)
-
+        
 class App:
     def __init__(self, root):
         self.root = root
