@@ -36,10 +36,11 @@ class UserManager:
 
 
 class LoginPage:
-    def __init__(self, master, user_manager, app):  # Added app argument
+    def __init__(self, master, user_manager, app, success_message=False):  # Added app argument
         self.master = master
         self.user_manager = user_manager
         self.app = app  # Store the app reference
+        self.success_message = success_message  # Store success_message flag
         self.create_widgets()
 
     def create_widgets(self):
@@ -78,14 +79,18 @@ class LoginPage:
         self.login_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
         self.login_error_label.pack(pady=(5, 2))
 
+        if self.success_message: # Check if a new user was created and show success message
+            success_label = ctk.CTkLabel(center_frame, text="User successfully created!", fg_color="green", font=("Arial", 16))
+            success_label.pack(pady=(5, 2))
+
         login_button = ctk.CTkButton(center_frame, text="Login", command=self.handle_login, height=50, width=300, font=("Arial", 18))  # Adjusted size
         login_button.pack(pady=(20, 10))
 
-        self.master.unbind('<Return>')
-        self.master.bind('<Return>', lambda event: self.handle_login())
-
         create_user_button = ctk.CTkButton(center_frame, text="Create New User", command=self.open_create_user_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         create_user_button.pack(pady=(10, 20))
+
+        exit_button = ctk.CTkButton(container_frame, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
+        exit_button.grid(row=4, column=0, pady=(10, 20))  # Positioned at the bottom
 
     def handle_login(self):
         username = self.username_entry.get()
@@ -97,7 +102,7 @@ class LoginPage:
         self.login_error_label.configure(text="")
 
         if username in users and users[username] == password:
-            self.app.open_main_page()  # Correct reference to the app's method
+            self.app.open_main_page(username)  # Pass the username to open_main_page, and open the main page
         else:
             self.login_error_label.configure(text="", fg_color="transparent")
             self.master.after(100, lambda: self.login_error_label.configure(text="Incorrect username or password.", fg_color="red"))
@@ -165,6 +170,10 @@ class CreateUserPage:
         back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_login_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         back_button.pack(pady=(10, 20))
 
+        # Exit button
+        exit_button = ctk.CTkButton(container_frame, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
+        exit_button.grid(row=5, column=0, pady=(10, 20))  # Positioned at the bottom
+
     def handle_create_user(self):
         new_username = self.new_username_entry.get()
         new_password = self.new_password_entry.get()
@@ -181,7 +190,7 @@ class CreateUserPage:
             self.show_error("Must create both a username and password.")
         else:
             self.user_manager.save_user(new_username, new_password)
-            self.app.open_login_page()
+            self.app.open_login_page(success_message=True)  # Show success message on login page
 
     def show_error(self, message):
         self.create_user_error_label.configure(text="", fg_color="transparent")
@@ -191,9 +200,10 @@ class CreateUserPage:
 
 
 class MainPage:
-    def __init__(self, master, app):
+    def __init__(self, master, app, username):
         self.master = master
         self.app = app
+        self.username = username
         self.create_widgets()
         # Grid the canvas into the electrogram_frame
         self.y_values = deque([0]*30, maxlen=30)  # Start with 30 zeros
@@ -220,7 +230,7 @@ class MainPage:
         date_time_label = ctk.CTkLabel(self.master, text=f"{formatted_datetime}", font=("Arial", 16))
         date_time_label.grid(row=0, column=0, columnspan=2, pady=2)
 
-        username_label = ctk.CTkLabel(self.master, text="User Name", font=("Arial", 16))
+        username_label = ctk.CTkLabel(self.master, text=f"Logged in as: {self.username}", font=("Arial", 16))
         username_label.grid(row=1, column=0, columnspan=2, pady=2)
 
         select_mode_label = ctk.CTkLabel(self.master, text="Select Mode", font=("Arial", 16))
@@ -231,31 +241,19 @@ class MainPage:
         pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state)
         pacemaker_state_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nwe", pady=2, padx=2)
 
-        admin_button = ctk.CTkButton(self.master, text="Admin Mode")
-        admin_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        # Segmented Button for Show Electrogram and Edit Parameters
+        self.segmented_button = ctk.CTkSegmentedButton(self.master, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
+        self.segmented_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        self.segmented_button.set("Edit Parameters")
 
-        # Show Electrogram button
-        show_electrogram_button = ctk.CTkButton(self.master, text="Show Electrogram", command=self.show_electrogram)
-        show_electrogram_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        # Edit Parameters button
-        edit_parameters_button = ctk.CTkButton(self.master, text="Edit Parameters", command=self.show_edit_frame)
-        edit_parameters_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        run_pacemaker_button = ctk.CTkButton(self.master, text="Run Pacemaker")
-        run_pacemaker_button.grid(row=7, column=0, sticky="new", pady=10, padx=(10, 1))
-
-        stop_pacemaker_button = ctk.CTkButton(self.master, text="Stop Pacemaker")
-        stop_pacemaker_button.grid(row=7, column=1, sticky="new", pady=10, padx=(10, 1))
+        edit_data_button = ctk.CTkButton(self.master, text="Export Data")
+        edit_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page)
-        logout_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         delete_user_button = ctk.CTkButton(self.master, text="Delete User")
-        delete_user_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        connection_label = ctk.CTkLabel(self.master, text="Connection Status", font=("Arial", 16))
-        connection_label.grid(row=0, column=2, sticky="new", pady=2)
+        delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
         exit_button.grid(row=0, column=3, sticky="new", pady=10, padx=(1, 10))
@@ -271,6 +269,30 @@ class MainPage:
         self.edit_frame.grid_forget()
 
         self.show_edit_frame()
+
+    def reset_plot(self):
+        self.y_values.clear()  # Clear existing y-values
+        self.x_values.clear()  # Clear existing x-values
+        self.y_values.extend([0] * 30)  # Reset y-values to 30 zeros
+        self.x_values.extend(range(0, 3000, 100))  # Reset x-values
+
+        # Update the line data
+        self.line.set_ydata(self.y_values)
+        self.line.set_xdata(self.x_values)
+
+        # Reset axis limits
+        self.ax.set_xlim(0, 3000)  # Show x-axis limits
+        self.ax.set_ylim(0, 1)     # Show y-axis limits
+
+        # Redraw the canvas
+        self.canvas.draw()
+
+    def segment_button_callback(self, value):
+        if value == "Show Electrogram":
+            self.show_electrogram()
+            self.reset_plot()
+        elif value == "Edit Parameters":
+            self.show_edit_frame()
 
     def show_electrogram(self):
         # Hide edit frame and show electrogram frame
@@ -350,24 +372,22 @@ class App:
         self.create_user_page = None
         self.main_page = None
         self.open_login_page()
-        
 
-    def open_login_page(self):
+    def open_login_page(self, success_message=False):
         self.clear_page()
-        self.login_page = LoginPage(self.root, self.user_manager, self)
+        self.login_page = LoginPage(self.root, self.user_manager, self, success_message)
 
     def open_create_user_page(self):
         self.clear_page()
         self.create_user_page = CreateUserPage(self.root, self.user_manager, self)
 
-    def open_main_page(self):
+    def open_main_page(self, username):
         self.clear_page()
-        self.main_page = MainPage(self.root, self)  # Correctly passing the app reference
+        self.main_page = MainPage(self.root, self, username)  # Correctly pass username when opening the main page
 
     def clear_page(self):
         for widget in self.root.winfo_children():
             widget.destroy()
-
 
 if __name__ == "__main__":
     root = tk.Tk()
