@@ -199,11 +199,12 @@ class CreateUserPage:
         self.new_password_entry.delete(0, tk.END)
 
 class MainPage:
-    def __init__(self, master, app, username):
+    def __init__(self, master, app, username, user_manager):
         self.master = master
         self.app = app
         self.username = username
         self.create_widgets()
+        self.user_manager = user_manager  # Ensure user_manager is passed in
         
         self.y_values = deque([0] * 30, maxlen=30)  # Start with 30 zeros
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values in milliseconds
@@ -269,7 +270,7 @@ class MainPage:
         logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page)
         logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        delete_user_button = ctk.CTkButton(self.master, text="Delete User")
+        delete_user_button = ctk.CTkButton(self.master, text="Delete User", command=self.delete_current_user)
         delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
@@ -277,6 +278,23 @@ class MainPage:
         
         # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(self.master)
+
+
+    def delete_current_user(self):
+        # Step 1: Read all users
+        users = self.user_manager.read_users()
+        current_username = self.username
+        # Step 2: Check if the current user exists
+        if current_username in users:
+            # Step 3: Delete the current user
+            del users[current_username]
+
+            # Step 4: Save the remaining users back to the file
+            with open(self.user_manager.file_path, "w") as f:
+                for username, password in users.items():
+                    f.write(f"{username}:{password}\n")
+
+        self.app.open_login_page()  # Open the login page after deleting the user
 
     def reset_plot(self):
         self.y_values.clear()  # Clear existing y-values
@@ -380,7 +398,7 @@ class App:
 
     def open_main_page(self, username):
         self.clear_page()
-        self.main_page = MainPage(self.root, self, username)  # Correctly pass username when opening the main page
+        self.main_page = MainPage(self.root, self, username, self.user_manager)  # Correctly pass username when opening the main page
 
     def clear_page(self):
         for widget in self.root.winfo_children():

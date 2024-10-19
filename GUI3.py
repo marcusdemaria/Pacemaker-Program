@@ -271,7 +271,7 @@ class MainPage:
         self.electrogram_frame.grid_forget()
         self.edit_frame.grid_forget()
 
-        self.show_edit_frame()
+        self.show_edit_frame() 
 
     def reset_plot(self):
         self.y_values.clear()  # Clear existing y-values
