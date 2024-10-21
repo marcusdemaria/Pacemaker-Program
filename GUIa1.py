@@ -341,7 +341,7 @@ class MainPage:
         self.rate_smoothing = tk.DoubleVar(value=12)  
 
     def delete_current_user(self):
-        # Step 1: Read all users
+        # Step 1: Read all users (this automatically decrypts the passwords using the UserManager's read_users method)
         users = self.user_manager.read_users()
         current_username = self.username
         # Step 2: Check if the current user exists
@@ -349,10 +349,12 @@ class MainPage:
             # Step 3: Delete the current user
             del users[current_username]
 
-            # Step 4: Save the remaining users back to the file
+            # Step 4: Re-encrypt and save the remaining users back to the file
             with open(self.user_manager.file_path, "w") as f:
                 for username, password in users.items():
-                    f.write(f"{username}:{password}\n")
+                    # Re-encrypt the password before saving
+                    encrypted_password = self.user_manager._encrypt_password(password)
+                    f.write(f"{username}:{encrypted_password}\n")
 
         self.app.open_login_page()  # Open the login page after deleting the user
 
