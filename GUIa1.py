@@ -314,15 +314,24 @@ class MainPage:
         edit_data_button = ctk.CTkButton(self.master, text="Export Data")
         edit_data_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
+        send_data_button = ctk.CTkButton(self.master, text="Send to Pacemaker")
+        send_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+
         logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page)
-        logout_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         delete_user_button = ctk.CTkButton(self.master, text="Delete User", command=self.delete_current_user)
-        delete_user_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
-        exit_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-    
+        exit_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+
+        # Admin Mode Toggle Button
+        self.admin_mode = tk.BooleanVar(value=False)
+        admin_mode_button = ctk.CTkButton(self.master, text="Admin Mode: OFF", command=self.toggle_admin_mode)
+        admin_mode_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        self.admin_mode_button = admin_mode_button
+
         # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(self.master)
 
@@ -340,8 +349,16 @@ class MainPage:
         self.hysteresis = tk.DoubleVar(value=3.0)  
         self.rate_smoothing = tk.DoubleVar(value=12)  
 
+    def toggle_admin_mode(self):
+        self.admin_mode.set(not self.admin_mode.get())
+        if self.admin_mode.get():
+            self.admin_mode_button.configure(text="Admin Mode: ON")
+        else:
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+        self.update_edit_frame(self.initial_state.get())
+
     def delete_current_user(self):
-        # Step 1: Read all users (this automatically decrypts the passwords using the UserManager's read_users method)
+        # Step 1: Read all users
         users = self.user_manager.read_users()
         current_username = self.username
         # Step 2: Check if the current user exists
@@ -463,9 +480,13 @@ class MainPage:
             # Bind the slider movement event to update the label with the current slider value
             slider.bind("<B1-Motion>", lambda event, lbl=input_label, lbl_text=label, sldr=slider: self.update_label_and_print(lbl, lbl_text, sldr))
 
+            # Disable the slider if admin mode is off
+            if not self.admin_mode.get():
+                slider.configure(state="disabled")
+
     def update_label_and_print(self, label, label_text, slider):
-        label.configure(text=f"{label_text}: {slider.get():.2f}")
-        print(f"{label_text}: {slider.get():.2f}")
+        label.configure(text=f"{label_text}: {slider.get():.1f}")
+        #print(f"{label_text}: {slider.get():.1f}")
 
     def update_plot(self):
         # Generate a new random y-value
