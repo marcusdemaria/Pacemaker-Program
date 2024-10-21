@@ -12,12 +12,36 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from datetime import datetime
 import time
 import serial.tools.list_ports
+from cryptography.fernet import Fernet
 
 USER_DATA_FILE = "users.txt"
 
 class UserManager:
     def __init__(self, file_path):
         self.file_path = file_path
+        # Generate a key for encryption/decryption and store it securely
+        # In a production setting, this key should be stored securely and not regenerated every time
+        self.key = self._get_or_generate_key()
+        self.cipher = Fernet(self.key)
+
+    def _get_or_generate_key(self):
+        key_file = "secret.key"
+        if os.path.exists(key_file):
+            with open(key_file, "rb") as f:
+                return f.read()
+        else:
+            key = Fernet.generate_key()
+            with open(key_file, "wb") as f:
+                f.write(key)
+            return key
+
+    def _encrypt_password(self, password):
+        """Encrypt the password."""
+        return self.cipher.encrypt(password.encode()).decode()
+
+    def _decrypt_password(self, encrypted_password):
+        """Decrypt the password."""
+        return self.cipher.decrypt(encrypted_password.encode()).decode()
 
     def read_users(self):
         if not os.path.exists(self.file_path):  # If the file does not exist, return an empty dictionary
@@ -26,13 +50,15 @@ class UserManager:
         with open(self.file_path, "r") as file:
             users = {}
             for line in file:
-                username, password = line.strip().split(":")
-                users[username] = password
+                username, encrypted_password = line.strip().split(":")
+                decrypted_password = self._decrypt_password(encrypted_password)
+                users[username] = decrypted_password
             return users
 
     def save_user(self, username, password):
+        encrypted_password = self._encrypt_password(password)
         with open(self.file_path, "a") as file:
-            file.write(f"{username}:{password}\n")
+            file.write(f"{username}:{encrypted_password}\n")
 
 class LoginPage:
     def __init__(self, master, user_manager, app, success_message=False):  # Added app argument
