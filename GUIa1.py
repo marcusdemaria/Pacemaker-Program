@@ -12,36 +12,12 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from datetime import datetime
 import time
 import serial.tools.list_ports
-from cryptography.fernet import Fernet
 
 USER_DATA_FILE = "users.txt"
 
 class UserManager:
     def __init__(self, file_path):
         self.file_path = file_path
-        # Generate a key for encryption/decryption and store it securely
-        # In a production setting, this key should be stored securely and not regenerated every time
-        self.key = self._get_or_generate_key()
-        self.cipher = Fernet(self.key)
-
-    def _get_or_generate_key(self):
-        key_file = "secret.key"
-        if os.path.exists(key_file):
-            with open(key_file, "rb") as f:
-                return f.read()
-        else:
-            key = Fernet.generate_key()
-            with open(key_file, "wb") as f:
-                f.write(key)
-            return key
-
-    def _encrypt_password(self, password):
-        """Encrypt the password."""
-        return self.cipher.encrypt(password.encode()).decode()
-
-    def _decrypt_password(self, encrypted_password):
-        """Decrypt the password."""
-        return self.cipher.decrypt(encrypted_password.encode()).decode()
 
     def read_users(self):
         if not os.path.exists(self.file_path):  # If the file does not exist, return an empty dictionary
@@ -50,15 +26,13 @@ class UserManager:
         with open(self.file_path, "r") as file:
             users = {}
             for line in file:
-                username, encrypted_password = line.strip().split(":")
-                decrypted_password = self._decrypt_password(encrypted_password)
-                users[username] = decrypted_password
+                username, password = line.strip().split(":")
+                users[username] = password
             return users
 
     def save_user(self, username, password):
-        encrypted_password = self._encrypt_password(password)
         with open(self.file_path, "a") as file:
-            file.write(f"{username}:{encrypted_password}\n")
+            file.write(f"{username}:{password}\n")
 
 class LoginPage:
     def __init__(self, master, user_manager, app, success_message=False):  # Added app argument
@@ -296,33 +270,33 @@ class MainPage:
         date_time_label.grid(row=0, column=0, columnspan=2, pady=2)
 
         username_label = ctk.CTkLabel(self.master, text=f"Logged in as: {self.username}", font=("Arial", 16))
-        username_label.grid(row=1, column=0, columnspan=2, pady=2)
+        username_label.grid(row=0, column=3, columnspan=2, pady=2)
 
         select_mode_label = ctk.CTkLabel(self.master, text="Select Mode", font=("Arial", 16))
-        select_mode_label.grid(row=2, column=0, columnspan=2, pady=2)
+        select_mode_label.grid(row=1, column=0, columnspan=2, pady=2)
 
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"]
         self.initial_state = tk.StringVar(value="AOO")
         pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame)
-        pacemaker_state_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nwe", pady=2, padx=2)
+        pacemaker_state_optionmenu.grid(row=2, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         # Segmented Button for Show Electrogram and Edit Parameters
         self.segmented_button = ctk.CTkSegmentedButton(self.master, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
-        self.segmented_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        self.segmented_button.grid(row=3, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
         self.segmented_button.set("Edit Parameters")
 
         edit_data_button = ctk.CTkButton(self.master, text="Export Data")
-        edit_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        edit_data_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page)
-        logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        logout_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         delete_user_button = ctk.CTkButton(self.master, text="Delete User", command=self.delete_current_user)
-        delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        delete_user_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
-        exit_button.grid(row=0, column=3, sticky="new", pady=10, padx=(1, 10))
-        
+        exit_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+    
         # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(self.master)
 
@@ -333,12 +307,12 @@ class MainPage:
         self.atrial_pulse_width = tk.DoubleVar(value=1)
         self.ventricular_amplitude = tk.DoubleVar(value=3.5)
         self.ventricular_pulse_width = tk.DoubleVar(value=1)
-        self.atrial_sensitivity = tk.DoubleVar(value=2.5)  # Added missing attribute
-        self.ventrical_sensitivity = tk.DoubleVar(value=2.5)  # Added missing attribute
-        self.arp = tk.DoubleVar(value=250)  # Added missing attribute
-        self.vrp = tk.DoubleVar(value=250)  # Added missing attribute
-        self.hysteresis = tk.DoubleVar(value=3.0)  # Added missing attribute
-        self.rate_smoothing = tk.DoubleVar(value=12)  # Added missing attribute
+        self.atrial_sensitivity = tk.DoubleVar(value=2.5) 
+        self.ventrical_sensitivity = tk.DoubleVar(value=2.5) 
+        self.arp = tk.DoubleVar(value=250) 
+        self.vrp = tk.DoubleVar(value=250)  
+        self.hysteresis = tk.DoubleVar(value=3.0)  
+        self.rate_smoothing = tk.DoubleVar(value=12)  
 
     def delete_current_user(self):
         # Step 1: Read all users
@@ -463,7 +437,7 @@ class MainPage:
 
     def update_label_and_print(self, label, label_text, slider):
         label.configure(text=f"{label_text}: {slider.get():.2f}")
-        # print(f"{label_text}: {slider.get():.2f}")
+        print(f"{label_text}: {slider.get():.2f}")
 
     def update_plot(self):
         # Generate a new random y-value
