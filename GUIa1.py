@@ -238,7 +238,7 @@ class MainPage:
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values in milliseconds
 
         # Create a figure and axis for the plot
-        self.fig = Figure(figsize=(5, 4), dpi=100)  # Adjust size for better visibility
+        self.fig = Figure(figsize=(3, 3), dpi=100)  # Adjust size for better visibility
         self.ax = self.fig.add_subplot(111)
 
         # Label the graph
