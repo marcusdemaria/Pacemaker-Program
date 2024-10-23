@@ -1,3 +1,6 @@
+from multiprocessing import connection
+from pdb import run
+from tracemalloc import stop
 import customtkinter as ctk
 import tkinter as tk
 import os
@@ -7,11 +10,8 @@ from PIL import Image, ImageTk
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from datetime import datetime
-#from multiprocessing import connection
-#from pdb import run
-#from tracemalloc import stop
-
-import colours
+import time
+import serial.tools.list_ports
 
 USER_DATA_FILE = "users.txt"
 
@@ -34,8 +34,13 @@ class UserManager:
         with open(self.file_path, "a") as file:
             file.write(f"{username}:{password}\n")
 
+    def save_all_users(self, users):
+        with open(self.file_path, "w") as file:
+            for username, password in users.items():
+                file.write(f"{username}:{password}\n")
+
 class LoginPage:
-    def __init__(self, master, user_manager, app, success_message=False):
+    def __init__(self, master, user_manager, app, success_message=False):  # Added app argument
         self.master = master
         self.user_manager = user_manager
         self.app = app  # Store the app reference
@@ -85,6 +90,9 @@ class LoginPage:
         login_button = ctk.CTkButton(center_frame, text="Login", command=self.handle_login, height=50, width=300, font=("Arial", 18))  # Adjusted size
         login_button.pack(pady=(20, 10))
 
+        self.master.unbind("<Return>")
+        self.master.bind("<Return>", lambda event: self.handle_login())
+
         create_user_button = ctk.CTkButton(center_frame, text="Create New User", command=self.open_create_user_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         create_user_button.pack(pady=(10, 20))
 
@@ -103,7 +111,8 @@ class LoginPage:
         if username in users and users[username] == password:
             self.app.open_main_page(username)  # Pass the username to open_main_page, and open the main page
         else:
-            self.login_error_label.configure(text="Incorrect username or password.", fg_color="red")
+            self.login_error_label.configure(text="", fg_color="transparent")
+            self.master.after(100, lambda: self.login_error_label.configure(text="Incorrect username or password.", fg_color="red"))
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
 
@@ -161,6 +170,9 @@ class CreateUserPage:
         create_user_button = ctk.CTkButton(center_frame, text="Create User", command=self.handle_create_user, height=50, width=300, font=("Arial", 18))  # Adjusted size
         create_user_button.pack(pady=(20, 10))
 
+        self.master.unbind("<Return>")
+        self.master.bind("<Return>", lambda event: self.handle_create_user())
+
         # Back button
         back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_login_page, height=50, width=300, font=("Arial", 18))  # Adjusted size
         back_button.pack(pady=(10, 20))
@@ -188,23 +200,147 @@ class CreateUserPage:
             self.app.open_login_page(success_message=True)  # Show success message on login page
 
     def show_error(self, message):
-        self.create_user_error_label.configure(text=message, fg_color="red")
+        self.create_user_error_label.configure(text="", fg_color="transparent")
+        self.master.after(100, lambda: self.create_user_error_label.configure(text=message, fg_color="red"))
         self.new_username_entry.delete(0, tk.END)
         self.new_password_entry.delete(0, tk.END)
 
-class MainPage:
-    def __init__(self, master, app, username):
+class ChangePasswordPage:
+    def __init__(self, master, user_manager, app, username):
         self.master = master
+        self.user_manager = user_manager
         self.app = app
-        self.username = username  # Store the username
+        self.username = username
         self.create_widgets()
-        self.y_values = deque([0]*30, maxlen=30)
-        self.x_values = deque(range(0, 3000, 100), maxlen=30)
-        self.fig = Figure(figsize=(5, 4), dpi=100)
-        self.ax = self.fig.add_subplot(111)
-        self.line, = self.ax.plot(self.x_values, self.y_values)
 
     def create_widgets(self):
+        # Create a frame for the change password form
+        container_frame = ctk.CTkFrame(self.master)
+        container_frame.pack(fill="both", expand=True)
+
+        # Configure grid for resizing
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.rowconfigure(0, weight=1)
+        container_frame.rowconfigure(1, weight=1)
+        container_frame.rowconfigure(2, weight=1)
+        container_frame.rowconfigure(3, weight=1)
+        container_frame.rowconfigure(4, weight=1)
+
+        # Center Frame to contain the change password form
+        center_frame = ctk.CTkFrame(container_frame)
+        center_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew")
+
+        change_password_label = ctk.CTkLabel(center_frame, text="Change Password", font=("Arial", 24))
+        change_password_label.pack(pady=(20, 10), padx=10, fill="both")
+
+        old_password_label = ctk.CTkLabel(center_frame, text="Old Password:", font=("Arial", 18))
+        old_password_label.pack(pady=(5, 2))
+
+        self.old_password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))
+        self.old_password_entry.pack(pady=10)
+
+        new_password_label = ctk.CTkLabel(center_frame, text="New Password:", font=("Arial", 18))
+        new_password_label.pack(pady=(5, 2))
+
+        self.new_password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))
+        self.new_password_entry.pack(pady=10)
+
+        self.change_password_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
+        self.change_password_error_label.pack(pady=(5, 2))
+
+        change_password_button = ctk.CTkButton(center_frame, text="Change Password", command=self.handle_change_password, height=50, width=300, font=("Arial", 18))
+        change_password_button.pack(pady=(20, 10))
+
+        back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_main_page, height=50, width=300, font=("Arial", 18))
+        back_button.pack(pady=(10, 20))
+
+    def handle_change_password(self):
+        old_password = self.old_password_entry.get()
+        new_password = self.new_password_entry.get()
+
+        users = self.user_manager.read_users()
+
+        if users[self.username] == old_password:
+            if " " in new_password or ":" in new_password or new_password == "":
+                self.show_error("New password cannot contain spaces or colons and must not be empty.")
+            else:
+                # Update the password in the file
+                users[self.username] = new_password
+                self.user_manager.save_all_users(users)  # Save the updated user data
+                self.app.open_login_page()  # Redirect back to login
+                self.show_message("Password successfully changed! Please log in again.")
+        else:
+            self.show_error("Old password is incorrect.")
+
+    def show_error(self, message):
+        self.change_password_error_label.configure(text=message, fg_color="red")
+        self.old_password_entry.delete(0, tk.END)
+        self.new_password_entry.delete(0, tk.END)
+
+    def show_message(self, message):
+        self.change_password_error_label.configure(text=message, fg_color="green")
+
+class MainPage:
+    def __init__(self, master, app, username, user_manager):
+        self.master = master
+        self.app = app
+        self.username = username
+        self.create_widgets()
+        self.user_manager = user_manager  # Ensure user_manager is passed in
+        
+        self.y_values = deque([0] * 30, maxlen=30)  # Start with 30 zeros
+        self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values in milliseconds
+
+        # Create a figure and axis for the plot
+        self.fig = Figure(figsize=(5, 4), dpi=100)  # Adjust size for better visibility
+        self.ax = self.fig.add_subplot(111)
+
+        # Label the graph
+        self.ax.set_title("Electrogram")  # Set the title of the plot
+        self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
+        self.ax.set_ylabel("Amplitude (V)")  # Label for the y-axis
+
+        self.line, = self.ax.plot(self.x_values, self.y_values)
+
+        # Initialize the electrogram frame and canvas
+        self.electrogram_frame = ctk.CTkFrame(self.master)
+        self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+
+        # Create the canvas for the plot
+        self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
+        
+        # Center the canvas in the frame with padding
+        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
+
+        # Configure grid for the electrogram frame to allow for padding
+        self.electrogram_frame.columnconfigure(0, weight=1)
+        self.electrogram_frame.rowconfigure(0, weight=1)
+
+        # Initialize by hiding the electrogram frame
+        self.electrogram_frame.grid_forget()
+        self.show_edit_frame()
+
+        # Microcontroller status label
+        self.microcontroller_status_label = ctk.CTkLabel(self.master, text="Pacemaker Status: Checking...", font=("Arial", 16), fg_color="transparent")
+        self.microcontroller_status_label.grid(row=1, column=3, pady=2)
+
+        # Start checking for microcontroller connection
+        self.check_microcontroller()
+
+    def check_microcontroller(self):
+        def check_ports():
+            ports = serial.tools.list_ports.comports()
+            if len(ports) > 0:
+                if self.microcontroller_status_label.winfo_exists():
+                    self.microcontroller_status_label.configure(text="Pacemaker Status: Connected", fg_color="transparent")
+            else:
+                if self.microcontroller_status_label.winfo_exists():
+                    self.microcontroller_status_label.configure(text="Pacemaker Status: Not Connected", fg_color="transparent")
+            self.master.after(1000, check_ports)  # Check every second
+        check_ports()
+
+    def create_widgets(self):
+        # Setting up the Grid Layout
         self.master.columnconfigure((0, 1), weight=1)
         self.master.columnconfigure((2, 3), weight=2)
         self.master.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
@@ -213,7 +349,7 @@ class MainPage:
         date_time_label = ctk.CTkLabel(self.master, text=f"{formatted_datetime}", font=("Arial", 16))
         date_time_label.grid(row=0, column=0, columnspan=2, pady=2)
 
-        username_label = ctk.CTkLabel(self.master, text=f"Username: {self.username}", font=("Arial", 16))  # Display the username
+        username_label = ctk.CTkLabel(self.master, text=f"Logged in as: {self.username}", font=("Arial", 16))
         username_label.grid(row=1, column=0, columnspan=2, pady=2)
 
         select_mode_label = ctk.CTkLabel(self.master, text="Select Mode", font=("Arial", 16))
@@ -221,43 +357,85 @@ class MainPage:
 
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"]
         self.initial_state = tk.StringVar(value="AOO")
-        pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state)
-        pacemaker_state_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nw", pady=2, padx=2)
+        pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame)
+        pacemaker_state_optionmenu.grid(row=3, column=0, columnspan=2, sticky="nwe", pady=2, padx=2)
 
-        admin_button = ctk.CTkButton(self.master, text="Admin Mode")
-        admin_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        # Segmented Button for Show Electrogram and Edit Parameters
+        self.segmented_button = ctk.CTkSegmentedButton(self.master, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
+        self.segmented_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        self.segmented_button.set("Edit Parameters")
 
-        show_electrogram_button = ctk.CTkButton(self.master, text="Show Electrogram", command=self.show_electrogram)
-        show_electrogram_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        edit_parameters_button = ctk.CTkButton(self.master, text="Edit Parameters", command=self.show_edit_frame)
-        edit_parameters_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        run_pacemaker_button = ctk.CTkButton(self.master, text="Run Pacemaker")
-        run_pacemaker_button.grid(row=7, column=0, sticky="new", pady=10, padx=(10, 1))
-
-        stop_pacemaker_button = ctk.CTkButton(self.master, text="Stop Pacemaker")
-        stop_pacemaker_button.grid(row=7, column=1, sticky="new", pady=10, padx=(10, 1))
+        edit_data_button = ctk.CTkButton(self.master, text="Export Data")
+        edit_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page)
-        logout_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
+        logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        delete_user_button = ctk.CTkButton(self.master, text="Delete User")
-        delete_user_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        connection_label = ctk.CTkLabel(self.master, text="Connection Status", font=("Arial", 16))
-        connection_label.grid(row=0, column=2, sticky="new", pady=2)
+        delete_user_button = ctk.CTkButton(self.master, text="Delete User", command=self.delete_current_user)
+        delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
         exit_button.grid(row=0, column=3, sticky="new", pady=10, padx=(1, 10))
 
-        self.electrogram_frame = ctk.CTkFrame(self.master)
+        change_password_button = ctk.CTkButton(self.master, text="Change Password", command=self.app.open_change_password_page)
+        change_password_button.grid(row=0, column=6, sticky="ne", pady=10, padx=10)
+        
+        # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(self.master)
 
-        self.electrogram_frame.grid_forget()
-        self.edit_frame.grid_forget()
+        # Initialize variables for the sliders
+        self.lower_rate_limit = tk.DoubleVar(value=60)
+        self.upper_rate_limit = tk.DoubleVar(value=120)
+        self.atrial_amplitude = tk.DoubleVar(value=3.5)
+        self.atrial_pulse_width = tk.DoubleVar(value=1)
+        self.ventricular_amplitude = tk.DoubleVar(value=3.5)
+        self.ventricular_pulse_width = tk.DoubleVar(value=1)
+        self.atrial_sensitivity = tk.DoubleVar(value=2.5)  # Added missing attribute
+        self.ventrical_sensitivity = tk.DoubleVar(value=2.5)  # Added missing attribute
+        self.arp = tk.DoubleVar(value=250)  # Added missing attribute
+        self.vrp = tk.DoubleVar(value=250)  # Added missing attribute
+        self.hysteresis = tk.DoubleVar(value=3.0)  # Added missing attribute
+        self.rate_smoothing = tk.DoubleVar(value=12)  # Added missing attribute
 
-        self.show_edit_frame()
+    def delete_current_user(self):
+        # Step 1: Read all users
+        users = self.user_manager.read_users()
+        current_username = self.username
+        # Step 2: Check if the current user exists
+        if current_username in users:
+            # Step 3: Delete the current user
+            del users[current_username]
+
+            # Step 4: Save the remaining users back to the file
+            with open(self.user_manager.file_path, "w") as f:
+                for username, password in users.items():
+                    f.write(f"{username}:{password}\n")
+
+        self.app.open_login_page()  # Open the login page after deleting the user
+
+    def reset_plot(self):
+        self.y_values.clear()  # Clear existing y-values
+        self.x_values.clear()  # Clear existing x-values
+        self.y_values.extend([0] * 30)  # Reset y-values to 30 zeros
+        self.x_values.extend(range(0, 3000, 100))  # Reset x-values
+
+        # Update the line data
+        self.line.set_ydata(self.y_values)
+        self.line.set_xdata(self.x_values)
+
+        # Reset axis limits
+        self.ax.set_xlim(0, 3000)  # Show x-axis limits
+        self.ax.set_ylim(0, 1)     # Show y-axis limits
+
+        # Redraw the canvas
+        self.canvas.draw()
+
+    def segment_button_callback(self, value):
+        if value == "Show Electrogram":
+            self.show_electrogram()
+            self.reset_plot()
+        elif value == "Edit Parameters":
+            self.show_edit_frame()
 
     def show_electrogram(self):
         # Hide edit frame and show electrogram frame
@@ -265,40 +443,84 @@ class MainPage:
 
         # Display electrogram frame with the plot
         self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
-        
-        # Embed the figure in a tkinter canvas
-        self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nesw', padx=10, pady=10)
-        self.electrogram_frame.columnconfigure(0, weight=1)  # Allow the column to expand
-        self.electrogram_frame.rowconfigure(0, weight=1)     # Allow the row to expand
-
         self.update_plot()
 
     def show_edit_frame(self):
-        # Hide electrogram frame and show edit frame
+        # Hide the electrogram frame to make the edit frame visible
         self.electrogram_frame.grid_forget()
-        
+
+        # Display the edit frame in the specified grid position with padding
         self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
 
-        # Clear existing widgets in the edit frame before adding new ones (optional)
+        # Clear existing widgets in the edit frame before adding new ones (optional for cleanliness)
         for widget in self.edit_frame.winfo_children():
             widget.destroy()
 
-        variables = [
-            "Lower Rate Limit (LRL): 60 bpm",
-            "Upper Rate Limit (URL): 120 bpm",
-            "Atrial Amplitude: 3.5V",
-            "Atrial Pulse Width: 0.4ms",
-            "Ventricular Pulse Width: 0.4ms",
-            "Ventricular Amplitude: 2.8V",
-            "Ventricular Refractory Period: 320ms",
-            "Atrial Refractory Period: 250ms",
-            "Mode: AOO"
-        ]
+        self.update_edit_frame(self.initial_state.get())
 
-        for input_text in variables:
-            input_label = ctk.CTkLabel(self.edit_frame, text=input_text)  # Use self.edit_frame
-            input_label.pack(pady=2, padx=2, anchor="w")  # Pack labels in the edit frame
+    def update_edit_frame(self, mode):
+        # Clear existing widgets in the edit frame before adding new ones (optional for cleanliness)
+        for widget in self.edit_frame.winfo_children():
+            widget.destroy()
+
+        if mode == "AOO":
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1)
+            ]
+        elif mode == "VOO":
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
+            ]
+        elif mode == "AAI":
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Atrial Sensitivity", 0, 5.0, self.atrial_sensitivity, 0.5),
+                ("ARP", 100, 500, self.arp, 10),
+                ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
+                ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
+            ]
+        elif mode == "VVI":
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
+                ("Ventrical Sensitivity", 0, 5.0, self.ventrical_sensitivity, 0.5),
+                ("VRP", 100, 500, self.vrp, 10),
+                ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
+                ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
+            ]
+        else:
+            variables = []
+
+        # Loop through the variable definitions to create labels and sliders
+        for label, min_val, max_val, var, increment in variables:
+            # Create and pack the label for the slider
+            input_label = ctk.CTkLabel(self.edit_frame, text=f"{label}: {var.get()}")
+            input_label.pack(pady=2, padx=2, anchor="w")
+
+            # Calculate the number of steps based on the increment
+            num_steps = int((max_val - min_val) / increment)
+
+            # Create and pack the slider with specified range, default value, and steps
+            slider = ctk.CTkSlider(self.edit_frame, from_=min_val, to=max_val, number_of_steps=num_steps, variable=var)
+            slider.pack(pady=2, padx=2, fill="x")
+
+            # Bind the slider movement event to update the label with the current slider value
+            slider.bind("<B1-Motion>", lambda event, lbl=input_label, lbl_text=label, sldr=slider: self.update_label_and_print(lbl, lbl_text, sldr))
+
+    def update_label_and_print(self, label, label_text, slider):
+        label.configure(text=f"{label_text}: {slider.get():.2f}")
+        # print(f"{label_text}: {slider.get():.2f}")
 
     def update_plot(self):
         # Generate a new random y-value
@@ -324,7 +546,7 @@ class MainPage:
 
         # Schedule the next update after 200 ms
         self.master.after(200, self.update_plot)
-
+        
 class App:
     def __init__(self, root):
         self.root = root
@@ -344,7 +566,7 @@ class App:
 
     def open_main_page(self, username):
         self.clear_page()
-        self.main_page = MainPage(self.root, self, username)  # Correctly pass username when opening the main page
+        self.main_page = MainPage(self.root, self, username, self.user_manager)  # Correctly pass username when opening the main page
 
     def clear_page(self):
         for widget in self.root.winfo_children():
