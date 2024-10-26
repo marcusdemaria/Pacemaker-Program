@@ -14,7 +14,7 @@ import time  # Import the time module for time-related functions (e.g., sleep)
 import serial.tools.list_ports  # Import the list_ports module from serial.tools to list available serial ports
 from cryptography.fernet import Fernet  # Import the Fernet class from the cryptography library for secure encryption and decryption, particularly for handling passwords
 
-USER_DATA_FILE = "users.txt"
+USER_DATA_FILE = "users.txt" # Reference file for handling user data
 
 class UserManager:
     def __init__(self, file_path):
@@ -66,7 +66,7 @@ class UserManager:
             file.write(f"{username}:{encrypted_password}\n") # Write the username and encrypted password to the file
 
 class LoginPage:
-    def __init__(self, master, user_manager, app, success_message=False):  
+    def __init__(self, master, user_manager, app, success_message=False):  # Initialize the login page
         self.master = master # The main window that contains everything
         self.user_manager = user_manager # UserManager instance to handle user data
         self.app = app  # Store the app reference to the main application
@@ -135,7 +135,6 @@ class LoginPage:
         exit_button = ctk.CTkButton(container_frame, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
         exit_button.grid(row=4, column=0, pady=(10, 20))  # At the bottom row
         
-
     def handle_login(self):
         # Get the username and password from the entry boxes entered by user
         username = self.username_entry.get()
@@ -419,7 +418,7 @@ class MainPage:
         # Redraw the canvas
         self.canvas.draw()
 
-    def segment_button_callback(self, value): # Perform an action based on the value passed (e.g., button selection)
+    def segment_button_callback(self, value): 
         if value == "Show Electrogram":
             self.show_electrogram() # Call the function to show the electrogram frame
             self.reset_plot() # Reset the plot when electrogram is shown

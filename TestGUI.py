@@ -410,3 +410,52 @@ if __name__ == "__main__":
     root.attributes('-fullscreen', True)
     root.bind("<Escape>", lambda event: root.attributes('-fullscreen', False))
     root.mainloop()
+
+# class UserManager:
+#     def __init__(self, file_path):
+#     def _get_or_generate_key(self):
+#     def _encrypt_password(self, password):
+#     def _decrypt_password(self, encrypted_password):
+#     def read_users(self):
+#     def save_user(self, username, password):
+
+# class LoginPage:
+#     def __init__(self, master, user_manager, app, success_message=False):
+#     def create_widgets(self):
+#     def handle_login(self):
+#     def login(self, username, password):
+#     def open_create_user_page(self):
+
+# class CreateUserPage:
+#     def __init__(self, master, user_manager, app):
+#     def create_widgets(self):
+#     def handle_create_user(self):
+#     def show_error(self, message):
+
+# class MainPage:
+#     def __init__(self, master, app, username, user_manager):
+#     def check_microcontroller(self):
+#     def create_widgets(self):
+#     def toggle_admin_mode(self):
+#     def delete_current_user(self):
+#     def reset_plot(self):
+#     def segment_button_callback(self, value):
+#     def show_electrogram(self):
+#     def show_edit_frame(self):
+#     def update_edit_frame(self, mode):
+#     def update_label_and_print(self, label, label_text, slider):
+#     def update_plot(self):
+
+# class App:
+#     def __init__(self, root):
+#     def open_login_page(self, success_message=False):
+#     def open_create_user_page(self):
+#     def open_main_page(self, username):
+#     def clear_page(self):
+
+# if __name__ == "__main__":
+#     root = tk.Tk()  # Create the main Tkinter root window
+#     app = App(root)  # Instantiate the App class, passing the root window as an argument
+#     root.attributes('-fullscreen', True)  # Set the window to fullscreen mode when the app starts
+#     root.bind("<Escape>", lambda event: root.attributes('-fullscreen', False))  # Bind the Escape key to exit fullscreen mode
+#     root.mainloop()  # Start the Tkinter event loop, which keeps the app running and responsive
