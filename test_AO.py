@@ -353,8 +353,8 @@ class CreateUserPage:
 
     def create_widgets(self):
         # Create a frame that will fill the window screen
-        container_frame = ctk.CTkFrame(self.master)
-        container_frame.pack(fill="both", expand=True) # Make it expand to fill the screen
+        container_frame = ctk.CTkFrame(self.master, width=200, height= 300, corner_radius=15, fg_color="#ADD8E6")
+        container_frame.pack(pady=30) # Make it expand to fill the screen
 
         # Configure a grid system inside the container for proper resizing
         container_frame.columnconfigure(0, weight=1)  # Allow column to stretch
@@ -363,11 +363,11 @@ class CreateUserPage:
         container_frame.rowconfigure(2, weight=1)  # For password label
         container_frame.rowconfigure(3, weight=1)  # For error label
         container_frame.rowconfigure(4, weight=1)  # For buttons
-        container_frame.rowconfigure(5, weight=1)  # For the exit button
+        
 
         # Center Frame to contain the create user form
         center_frame = ctk.CTkFrame(container_frame)
-        center_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew") # Positioned at the center
+        center_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew") # Positioned at the center
 
         # Label for the create user page
         create_user_label = ctk.CTkLabel(center_frame, text="Create a New User", font=("Arial", 24))
@@ -375,19 +375,19 @@ class CreateUserPage:
 
         # Label for the new username input
         new_username_label = ctk.CTkLabel(center_frame, text="New Username:", font=("Arial", 18))
-        new_username_label.pack(pady=(5, 2))
+        new_username_label.pack(pady=(5, 2), padx=52, anchor="w") # Add padding and align to the left
 
         # Entry box for the new username (with increased size)
         self.new_username_entry = ctk.CTkEntry(center_frame, height=40, width=300, font=("Arial", 18))  # Increased size
-        self.new_username_entry.pack(pady=10) # Add padding around the entry field
+        self.new_username_entry.pack(pady=(2,10),padx=50) # Add padding around the entry field
 
         # New Password label and entry
         new_password_label = ctk.CTkLabel(center_frame, text="New Password:", font=("Arial", 18))
-        new_password_label.pack(pady=(5, 2)) # Add padding between label and entry field
+        new_password_label.pack(pady=(5, 2), padx=52, anchor="w") # Add padding between label and entry field
 
         # Entry box for the new password (hidden characters with '*')
         self.new_password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))  # Password hidden
-        self.new_password_entry.pack(pady=10)  # Add padding around the entry field
+        self.new_password_entry.pack(pady=(2,10), padx=50)  # Add padding around the entry field
 
         # Label for displaying error messages (initially empty)
         self.create_user_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
@@ -406,10 +406,19 @@ class CreateUserPage:
         back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_login_page, height=50, width=300, font=("Arial", 18))
         back_button.pack(pady=(10, 20))  # Add padding for the back button
 
-        # Exit button at the bottom to close the window
-        exit_button = ctk.CTkButton(container_frame, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
-        exit_button.grid(row=5, column=0, pady=(10, 20))  # Position the exit button at the bottom
+        user_frame = ctk.CTkFrame(center_frame, fg_color="transparent")
+        user_frame.pack(pady=(10, 20))
+        total_users = len(os.listdir(self.user_manager.user_dir))
+        static_users_label = ctk.CTkLabel(user_frame, text=f"Total Users: ", font=("Arial", 16))
+        static_users_label.pack(side="left")
+        if total_users >= 10:
+            dynamic_users_label = ctk.CTkLabel(user_frame, text=f"{total_users}/10", font=("Arial", 16), text_color="red")
+            dynamic_users_label.pack(side="left")
+        else:
+            dynamic_users_label = ctk.CTkLabel(user_frame, text=f"{total_users}/10", font=("Arial", 16))
+            dynamic_users_label.pack(side="left")
 
+    # this might cause an issue with the sizing if the length of the error message is larger than the entry box
     def handle_create_user(self):
         new_username = self.new_username_entry.get()
         new_password = self.new_password_entry.get()
@@ -431,7 +440,7 @@ class CreateUserPage:
 
     def show_error(self, message):
         self.create_user_error_label.configure(text="", fg_color="transparent") # Clear any previous error messages
-        self.master.after(100, lambda: self.create_user_error_label.configure(text=message, fg_color="red")) # After 100 ms, show the error message
+        self.master.after(100, lambda: self.create_user_error_label.configure(text=message, text_color="red")) # After 100 ms, show the error message
         self.new_username_entry.delete(0, tk.END) # Clear the new username entry field
         self.new_password_entry.delete(0, tk.END) # Clear the new password entry field
 
