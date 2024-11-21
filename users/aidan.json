@@ -1,11 +1,11 @@
 {
     "username": "aidan",
-    "password": "gAAAAABnPqP44zGLOdc2C_lJudJyxsXOk9bvXTDyKKd32fYFfI5P1261tg4u4fN794L09G4uYSTKZ93l29nZMkuOOSDS7iGXiA==",
+    "password": "gAAAAABnP30daSOHRPq4PWHBF__mtu0rV6Aqbeob7t2bRa9WBhCC59Gl7IKEZ3_5PhNC96oiB7npcycpRxtTGgLS060AJijOKw==",
     "AOO": {
-        "Lower Rate Limit": 60,
-        "Upper Rate Limit": 120,
+        "Lower Rate Limit": 180.0,
+        "Upper Rate Limit": 120.0,
         "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 1
+        "Atrial Pulse Width": 24.0
     },
     "VOO": {
         "Lower Rate Limit": 60,
@@ -14,14 +14,14 @@
         "Ventricular Pulse Width": 1
     },
     "AAI": {
-        "Lower Rate Limit": 60,
-        "Upper Rate Limit": 120,
+        "Lower Rate Limit": 125.0,
+        "Upper Rate Limit": 120.0,
         "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 1,
+        "Atrial Pulse Width": 1.0,
         "Atrial Sensitivity": 2.5,
-        "ARP": 250,
+        "ARP": 250.0,
         "Hysteresis": 3.0,
-        "Rate Smoothing": 12
+        "Rate Smoothing": 12.0
     },
     "VVI": {
         "Lower Rate Limit": 60,

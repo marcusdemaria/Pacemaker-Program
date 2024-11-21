@@ -449,8 +449,11 @@ class MainPage:
         self.master = master # Reference to the main window
         self.app = app # Reference to the main application
         self.username = username # Store the username for the current user
-        self.create_widgets() # Call the function to create the interface elements
+        
         self.user_manager = user_manager  # Ensure user_manager is passed to the main page
+        
+        
+        #initial graphing data
         self.y_values = deque([0] * 30, maxlen=30)  # Y-axis values for the plot
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
 
@@ -465,8 +468,84 @@ class MainPage:
 
         self.line, = self.ax.plot(self.x_values, self.y_values)  #Plot the initial x and y values (empty or default data)
 
+        self.create_top_widgets()
+        self.create_widgets() # Call the function to create the interface elements
+
+    def create_top_widgets(self):
+        # Create a frame to contain the top bar
+        container_frame = ctk.CTkFrame(self.master, height=25, fg_color="#000000")
+        container_frame.pack(fill="x", pady=2)
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.columnconfigure(1, weight=1)
+        container_frame.columnconfigure(2, weight=1)
+
+        # Left section: Pacemaker Connection
+        pacemaker_connection_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
+        pacemaker_connection_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")  # Use a nested frame for label + icon
+
+        pacemaker_connection = ctk.CTkLabel(pacemaker_connection_frame, text="Pacemaker Connection:", font=("Arial", 14, "bold"))
+        pacemaker_connection.pack(side="left", padx=5)
+
+        connection_status = True  # Need to change this still
+        # Load the Pacemaker Icon
+        if connection_status==True:
+            pacemaker_icon_path = "icons/connected.png"
+        else:
+            pacemaker_icon_path = "icons/disconnected.png"  # Path to the saved pacemaker icon
+        pacemaker_image = Image.open(pacemaker_icon_path).resize((20, 20))  # Resize as needed
+        pacemaker_icon = ImageTk.PhotoImage(pacemaker_image)
+
+        # Pacemaker Icon Label
+        pacemaker_icon_label = ctk.CTkLabel(pacemaker_connection_frame, image=pacemaker_icon, text="")
+        pacemaker_icon_label.image = pacemaker_icon  # Prevent garbage collection
+        pacemaker_icon_label.pack(side="left")
+
+        # Middle section: Date and Time
+        self.date_time_label = ctk.CTkLabel(container_frame, text="", font=("Arial", 14), anchor="center")
+        self.date_time_label.grid(row=0, column=1, padx=10, pady=10)
+
+        # Right section: Battery Life
+        battery_life_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
+        battery_life_frame.grid(row=0, column=2, padx=10, pady=10, sticky="e")  # Use a nested frame for label + icon
+
+        # Battery Life Label
+        battery_life = ctk.CTkLabel(battery_life_frame, text="Battery Life:", font=("Arial", 14))
+        battery_life.pack(side="left", padx=5)
+
+        # Load the Battery Icon
+        battery_icon_path = "icons/battery.png"  # Path to the saved battery icon
+        battery_image = Image.open(battery_icon_path).resize((20, 20))  # Resize as needed
+        battery_icon = ImageTk.PhotoImage(battery_image)
+
+        # Battery Icon Label
+        battery_icon_label = ctk.CTkLabel(battery_life_frame, image=battery_icon, text="")
+        battery_icon_label.image = battery_icon  # Prevent garbage collection
+        battery_icon_label.pack(side="left")
+
+        # Start updating the time
+        self.update_time()
+
+
+
+    def update_time(self):
+        if self.date_time_label.winfo_exists():
+            formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
+            self.date_time_label.configure(text=f"{formatted_datetime}")
+            self.master.after(1000, self.update_time)  # Schedule the next update
+
+   
+    def create_widgets(self):
+
+        container_frame = ctk.CTkFrame(self.master, fg_color="transparent")
+        container_frame.pack(fill="both", expand=True)
+        # Setting up the Grid Layout
+        container_frame.columnconfigure((0, 1), weight=1)
+        container_frame.columnconfigure((2, 3), weight=2)
+        container_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
+
+        #setting up graph area
         # Create a canvas widget to display the matplotlib figure within the tkinter frame.
-        self.electrogram_frame = ctk.CTkFrame(self.master)
+        self.electrogram_frame = ctk.CTkFrame(container_frame)
         self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # Create the canvas for the plot
@@ -475,87 +554,53 @@ class MainPage:
         # Attach the canvas to the tkinter grid, center it within the frame with padding.
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
 
-        # Configure grid for the electrogram frame to allow for padding
-        self.electrogram_frame.columnconfigure(0, weight=1)
-        self.electrogram_frame.rowconfigure(0, weight=1)
+        # Frame for editing parameters
+        self.edit_frame = ctk.CTkScrollableFrame(container_frame)
+        self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        
+         
+        #Setting up the rest of the area
 
-        # Initialize by hiding the electrogram frame
-        self.electrogram_frame.grid_forget()
-        self.show_edit_frame()
-
-        # Microcontroller status label
-        self.microcontroller_status_label = ctk.CTkLabel(self.master, text="Pacemaker Status: Checking...", font=("Arial", 16), fg_color="transparent")
-        self.microcontroller_status_label.grid(row=1, column=3, pady=2)
-
-        # Start checking for microcontroller connection
-        self.check_microcontroller()
-
-    def check_microcontroller(self):
-        # Define a function to continuously check for connected serial ports (microcontroller).
-        def check_ports():
-            ports = serial.tools.list_ports.comports() # Get a list of all connected serial ports.
-            # If any ports are found, update the status label to "Connected".
-            if len(ports) > 0:
-                if self.microcontroller_status_label.winfo_exists():
-                    self.microcontroller_status_label.configure(text="Pacemaker Status: Connected", fg_color="transparent")
-            else:
-                # If no ports are found, update the status label to "Not Connected".
-                if self.microcontroller_status_label.winfo_exists():
-                    self.microcontroller_status_label.configure(text="Pacemaker Status: Not Connected", fg_color="transparent")
-            self.master.after(1000, check_ports) # Check again after 1 second (1000 ms).
-        check_ports() # Start the check_ports function for the first time.
-
-    def create_widgets(self):
-        # Setting up the Grid Layout
-        self.master.columnconfigure((0, 1), weight=1)
-        self.master.columnconfigure((2, 3), weight=2)
-        self.master.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
-
-        formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S") # Get the current date and time and format it as a string.
-        date_time_label = ctk.CTkLabel(self.master, text=f"{formatted_datetime}", font=("Arial", 16)) # Create a label to display the date and time.
-        date_time_label.grid(row=0, column=0, columnspan=2, pady=2) # Place the date-time label in the grid at the specified position.
-
-        username_label = ctk.CTkLabel(self.master, text=f"Logged in as: {self.username}", font=("Arial", 16))  # Create a label that shows the username of the logged-in user.
-        username_label.grid(row=0, column=3, columnspan=2, pady=2)  # Place the username label in the grid.
-
-        select_mode_label = ctk.CTkLabel(self.master, text="Select Mode", font=("Arial", 16)) # Create a label for selecting pacemaker modes.
+        select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16)) # Create a label for selecting pacemaker modes.
         select_mode_label.grid(row=1, column=0, columnspan=2, pady=2) # Place the mode label in the grid.
 
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
         self.initial_state = tk.StringVar(value="AOO")  # Initialize the pacemaker mode variable with a default value of "AOO".
-        pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
+        pacemaker_state_optionmenu = ctk.CTkOptionMenu(container_frame, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
         pacemaker_state_optionmenu.grid(row=2, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the option menu in the grid.
 
         # Segmented Button for Show Electrogram and Edit Parameters
-        self.segmented_button = ctk.CTkSegmentedButton(self.master, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
+        self.segmented_button = ctk.CTkSegmentedButton(container_frame, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
         self.segmented_button.grid(row=3, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))  # Place the segmented button in the grid
         self.segmented_button.set("Edit Parameters") # Set the default selection to "Edit Parameters"
 
-        edit_data_button = ctk.CTkButton(self.master, text="Update Data", command=self.update_user_data) # Create a button to export data
+        edit_data_button = ctk.CTkButton(container_frame, text="Update Data", command=self.update_user_data) # Create a button to export data
         edit_data_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        send_data_button = ctk.CTkButton(self.master, text="Send to Pacemaker") # Create a button to send data to the pacemaker
+        send_data_button = ctk.CTkButton(container_frame, text="Send to Pacemaker") # Create a button to send data to the pacemaker
         send_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page) # Create a button to log out
+        logout_button = ctk.CTkButton(container_frame, text="Logout", command=self.app.open_login_page) # Create a button to log out
         logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        delete_user_button = ctk.CTkButton(self.master, text="Delete User", command=self.delete_current_user) # Create a button to delete the current user
+        delete_user_button = ctk.CTkButton(container_frame, text="Delete User", command=self.delete_current_user) # Create a button to delete the current user
         delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809") # Create an exit button to close the app
+        exit_button = ctk.CTkButton(container_frame, text="Exit", command=container_frame.destroy, fg_color="red", hover_color="#bd1809") # Create an exit button to close the app
         exit_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         # Admin Mode Toggle Button
         self.admin_mode = tk.BooleanVar(value=False) # Initialize a Boolean variable to track the state of admin mode (OFF by default)
-        admin_mode_button = ctk.CTkButton(self.master, text="Admin Mode: OFF", command=self.toggle_admin_mode) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
+        admin_mode_button = ctk.CTkButton(container_frame, text="Admin Mode: OFF", command=self.toggle_admin_mode) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
         admin_mode_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the button in the grid layout at row 8, column 0, spanning 2 columns with padding
         self.admin_mode_button = admin_mode_button # Store the reference to the button in self.admin_mode_button for later use
 
-        # Frame for editing parameters
-        self.edit_frame = ctk.CTkScrollableFrame(self.master)
+        # Initialize by hiding the electrogram frame
+        self.electrogram_frame.grid_forget()
+        self.show_edit_frame() 
+        
 
-       
+        
         
 
     def toggle_admin_mode(self):
