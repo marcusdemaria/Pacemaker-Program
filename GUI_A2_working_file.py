@@ -1,6 +1,3 @@
-from multiprocessing import connection  # Import the connection module from the multiprocessing library for handling inter-process communication
-from pdb import run  # Import the run function from the pdb (Python Debugger) module to facilitate debugging
-from tracemalloc import stop  # Import the stop function from tracemalloc to stop memory tracking
 import customtkinter as ctk  # Import the CustomTkinter library, which provides custom themed widgets for Tkinter, as 'ctk'
 import tkinter as tk  # Import the standard Tkinter library for creating GUI applications, as 'tk'
 import os  # Import the os module for interacting with the operating system (file and directory management)
@@ -10,8 +7,6 @@ from PIL import Image, ImageTk  # Import the Image and ImageTk classes from the 
 from matplotlib.figure import Figure  # Import the Figure class from matplotlib for creating figures for plotting
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Import the FigureCanvasTkAgg class to integrate Matplotlib figures into Tkinter
 from datetime import datetime  # Import the datetime class to handle date and time operations
-import time  # Import the time module for time-related functions (e.g., sleep)
-import serial.tools.list_ports  # Import the list_ports module from serial.tools to list available serial ports
 from cryptography.fernet import Fernet  # Import the Fernet class from the cryptography library for secure encryption and decryption, particularly for handling passwords
 import json
 import re  # For sanitizing filenames
@@ -206,19 +201,19 @@ class LoginPage:
 
         # Username label
         username_label = ctk.CTkLabel(center_frame, text="Username:", font=("Arial", 18))
-        username_label.pack(pady=(5, 2))
+        username_label.pack(pady=(5, 2),padx=178, anchor='w')
 
         # Entry box for the username (adjusted height and width)
         self.username_entry = ctk.CTkEntry(center_frame, height=40, width=300, font=("Arial", 18))
-        self.username_entry.pack(pady=10)
+        self.username_entry.pack(pady=(2,5))
 
         # Password label
         password_label = ctk.CTkLabel(center_frame, text="Password:", font=("Arial", 18))
-        password_label.pack(pady=(5, 2))
+        password_label.pack(pady=(5, 2), padx=178, anchor='w')
 
         # Entry box for the password (shows '*' instead of actual characters)
         self.password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))
-        self.password_entry.pack(pady=10)
+        self.password_entry.pack(pady=(2,5))
 
         # Label to show error messages if login fails (initially empty)
         self.login_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
@@ -458,7 +453,7 @@ class MainPage:
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
 
         # Create a figure and axis for the plot
-        self.fig = Figure(figsize=(3, 3), dpi=100)  # Adjust size for better visibility
+        self.fig = Figure(figsize=(3, 5), dpi=100)  # Adjust size for better visibility
         self.ax = self.fig.add_subplot(111)
 
         # Label the graph
@@ -540,81 +535,151 @@ class MainPage:
         container_frame.pack(fill="both", expand=True)
         # Setting up the Grid Layout
         container_frame.columnconfigure((0, 1), weight=1)
-        container_frame.columnconfigure((2, 3), weight=2)
+        container_frame.columnconfigure((2, 3), weight=4)
         container_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
 
         #setting up graph area
         # Create a canvas widget to display the matplotlib figure within the tkinter frame.
-        self.electrogram_frame = ctk.CTkFrame(container_frame)
-        self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.electrogram_frame = ctk.CTkScrollableFrame(container_frame)
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         # Create the canvas for the plot
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
         
         # Attach the canvas to the tkinter grid, center it within the frame with padding.
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(container_frame)
-        self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
         
          
         #Setting up the rest of the area
 
-        select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16)) # Create a label for selecting pacemaker modes.
-        select_mode_label.grid(row=1, column=0, columnspan=2, pady=2) # Place the mode label in the grid.
+        select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16, "bold")) # Create a label for selecting pacemaker modes.
+        select_mode_label.grid(row=0, column=0, pady=1, padx=10, sticky="sw") # Place the mode label in the grid.
 
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
         self.initial_state = tk.StringVar(value="AOO")  # Initialize the pacemaker mode variable with a default value of "AOO".
         pacemaker_state_optionmenu = ctk.CTkOptionMenu(container_frame, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
-        pacemaker_state_optionmenu.grid(row=2, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the option menu in the grid.
+        pacemaker_state_optionmenu.grid(row=1, column=0, sticky="new", pady=1, padx=(10, 1)) # Place the option menu in the grid.
 
         # Segmented Button for Show Electrogram and Edit Parameters
-        self.segmented_button = ctk.CTkSegmentedButton(container_frame, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
-        self.segmented_button.grid(row=3, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))  # Place the segmented button in the grid
+        self.segmented_button = ctk.CTkSegmentedButton(container_frame, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback, font=("Arial", 16, "bold")) # Create a segmented button with two options
+        self.segmented_button.grid(row=2, column=0, sticky="nesw", pady=1, padx=(10, 1))  # Place the segmented button in the grid
         self.segmented_button.set("Edit Parameters") # Set the default selection to "Edit Parameters"
 
-        edit_data_button = ctk.CTkButton(container_frame, text="Update Data", command=self.update_user_data) # Create a button to export data
-        edit_data_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        send_data_button = ctk.CTkButton(container_frame, text="Send to Pacemaker") # Create a button to send data to the pacemaker
-        send_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        logout_button = ctk.CTkButton(container_frame, text="Logout", command=self.app.open_login_page) # Create a button to log out
-        logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        delete_user_button = ctk.CTkButton(container_frame, text="Delete User", command=self.delete_current_user) # Create a button to delete the current user
-        delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        exit_button = ctk.CTkButton(container_frame, text="Exit", command=container_frame.destroy, fg_color="red", hover_color="#bd1809") # Create an exit button to close the app
-        exit_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
+        edit_data_button = ctk.CTkButton(container_frame, text="Save Data", command=self.update_user_data_check, font=("Arial", 22, "bold")) # Create a button to export data
+        edit_data_button.grid(row=3, column=0, sticky="nesw", pady=1, padx=(10, 1))
+        self.edit_data_button = edit_data_button # Store the reference to the button in self.edit_data_button for later use
+        self.edit_data_button.configure(state="disabled") # Disable the edit data button
+            
         # Admin Mode Toggle Button
         self.admin_mode = tk.BooleanVar(value=False) # Initialize a Boolean variable to track the state of admin mode (OFF by default)
-        admin_mode_button = ctk.CTkButton(container_frame, text="Admin Mode: OFF", command=self.toggle_admin_mode) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
-        admin_mode_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the button in the grid layout at row 8, column 0, spanning 2 columns with padding
+        admin_mode_button = ctk.CTkButton(container_frame, text="Admin Mode: OFF", command=self.toggle_admin_mode, font=("Arial", 22, "bold")) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
+        admin_mode_button.grid(row=4, column=0, sticky="nesw", pady=1, padx=(10, 1)) # Place the button in the grid layout at row 8, column 0, spanning 2 columns with padding
         self.admin_mode_button = admin_mode_button # Store the reference to the button in self.admin_mode_button for later use
+
+        logout_button = ctk.CTkButton(container_frame, text="Logout", command=self.app.open_login_page, font=("Arial", 22, "bold")) # Create a button to log out
+        logout_button.grid(row=7, column=0, sticky="nesw", pady=1, padx=(10, 1))
+
+        delete_user_button = ctk.CTkButton(container_frame, text="Delete User", command=self.delete_current_user_check, font=("Arial", 22, "bold")) # Create a button to delete the current user
+        delete_user_button.grid(row=8, column=0, sticky="nesw", pady=(1,10), padx=(10, 1))
+        self.delete_user_button = delete_user_button # Store the reference to the button in self.delete_user_button for later use
+        self.delete_user_button.configure(state="disabled")
+        
 
         # Initialize by hiding the electrogram frame
         self.electrogram_frame.grid_forget()
         self.show_edit_frame() 
-        
 
-        
-        
 
     def toggle_admin_mode(self):
-        self.admin_mode.set(not self.admin_mode.get()) # Change the admin_mode variable to its opposite value (toggle it)
-        if self.admin_mode.get(): # Update the button text based on the new state of admin mode
-            self.admin_mode_button.configure(text="Admin Mode: ON") # Change text of button to ON
-        else:  # If admin mode is OFF
-            self.admin_mode_button.configure(text="Admin Mode: OFF") # Change text of button to OFF
+        if not self.admin_mode.get():  # Admin Mode is OFF, prompt for a password
+            # Create a popup frame and store it as an instance attribute
+            self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+            self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            
+            # Create the label, entry, and submit button inside the popup frame
+            self.admin_label = ctk.CTkLabel(self.popup_frame, text="Enter Admin Password:", font=("Arial", 16, "bold"))  
+            self.admin_label.pack(pady=10, padx=15)  # Add padding to the label
+            
+            self.admin_password_entry = ctk.CTkEntry(self.popup_frame, show="*", font=("Arial", 16))  
+            self.admin_password_entry.pack(pady=10)  # Add padding to the entry field
+            
+            self.submit_button = ctk.CTkButton(
+                self.popup_frame, 
+                text="Submit", 
+                command=self.check_admin_password, 
+                font=("Arial", 16, "bold")
+            )  
+            self.submit_button.pack(pady=10)  # Add padding to the submit button
+        else:
+            # Incorrect password: disable admin mode and show an error message
+            self.admin_mode.set(False)
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+            self.edit_data_button.configure(state="disabled")
+            self.delete_user_button.configure(state="disabled")
+            self.update_edit_frame(self.initial_state.get())
+
+    def check_admin_password(self):
+        # Get the entered password
+        entered_password = self.admin_password_entry.get()  
+        
+        # Validate the entered password
+        if entered_password == "1234":  # Replace with a secure password
+            # Correct password: enable admin mode
+            self.admin_mode.set(True)
+            self.admin_mode_button.configure(text="Admin Mode: ON")
+            self.edit_data_button.configure(state="normal")
+            self.delete_user_button.configure(state="normal")
+            # Destroy the popup frame and its contents
+            self.popup_frame.destroy()
+            self.correct_password = ctk.CTkLabel(self.master, text="Correct Password", font=("Arial", 16, "bold"), text_color="green")
+            self.correct_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            self.master.after(3000, lambda: self.correct_password.destroy())
+        else:
+            # Incorrect password: disable admin mode and show an error message
+            self.admin_mode.set(False)
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+            self.edit_data_button.configure(state="disabled")
+            self.delete_user_button.configure(state="disabled")
+            # Destroy the popup frame and its contents
+            self.popup_frame.destroy()
+            self.incorrect_password = ctk.CTkLabel(self.master, text="Incorrect Password", font=("Arial", 16, "bold"), text_color="red")
+            self.incorrect_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            self.master.after(3000, lambda: self.incorrect_password.destroy())
+            
+        
+        
+
+        # Update the frame with the new admin state
         self.update_edit_frame(self.initial_state.get())
+    
+    def delete_current_user_check(self):
+         # Create a popup frame and store it as an instance attribute
+        self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+        # Create BooleanVar for checkboxes
+        self.checkbox1_var = ctk.BooleanVar()
+        self.checkbox2_var = ctk.BooleanVar()
+        self.check = ctk.CTkLabel(self.popup_frame, text="Are you sure you want to delete this account?", font=("Arial", 16, "bold"))
+        self.check.pack(pady=10, padx=10)
+        # Create checkboxes
+        self.checkbox1 = ctk.CTkCheckBox(self.popup_frame, text="Yes", variable=self.checkbox1_var, command=self.delete_current_user)
+        self.checkbox1.pack(side="left", pady=10, padx=(50, 10))
+
+        self.checkbox2 = ctk.CTkCheckBox(self.popup_frame, text="No", variable=self.checkbox2_var, command=self.delete_current_user)
+        self.checkbox2.pack(side="right", pady=10, padx=10)
 
     def delete_current_user(self):
-        current_user = self.username  # Get the username of the current user
-        self.user_manager.delete_user(current_user)  # Delete the current user
-        self.app.open_login_page()  # Open the login page after deleting the user
+        if self.checkbox1_var.get() and not self.checkbox2_var.get():
+            self.popup_frame.destroy()
+            current_user = self.username  # Get the username of the current user
+            self.user_manager.delete_user(current_user)  # Delete the current user
+            self.app.open_login_page()  # Open the login page after deleting the user
+        else:
+            self.popup_frame.destroy()
 
     def reset_plot(self):
         self.y_values.clear()  # Clear existing y-values
@@ -645,15 +710,40 @@ class MainPage:
         self.edit_frame.grid_forget() # Remove the edit frame from the grid layout (not destroyed, just hidden)
 
         # Display electrogram frame with the plot
-        self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
         self.update_plot() # Call the function to update the plot with new values or refreshed data
 
+    def update_plot(self):
+        # Generate a new random y-value between 0 and 1
+        new_y_value = random.uniform(0, 1)
+
+        # Update the y_values deque
+        self.y_values.append(new_y_value)
+
+        # Shift the x-values to create a moving window effect
+        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
+        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
+
+        # Update the plot data with the new x and y values
+        self.line.set_ydata(self.y_values) # Update the y-data of the plot line
+        self.line.set_xdata(self.x_values) # Update the x-data of the plot line
+
+        # Set x-axis limits to show the last 3000 ms of data
+        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
+        self.ax.set_ylim(0, 1)  # Set Y-axis range
+
+        # Redraw the canvas with the updated plot
+        self.canvas.draw()
+
+        # Schedule the next update after 200 ms
+        self.master.after(200, self.update_plot)
+    
     def show_edit_frame(self):
         # Hide the electrogram frame to make the edit frame visible
         self.electrogram_frame.grid_forget()
 
         # Display the edit frame in the specified grid position with padding
-        self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         # Clear existing widgets in the edit frame before adding new ones (optional for cleanliness)
         for widget in self.edit_frame.winfo_children(): # Iterate through each widget inside the edit frame
@@ -767,66 +857,62 @@ class MainPage:
     def update_label_and_print(self, label, label_text, slider):
         label.configure(text=f"{label_text}: {slider.get():.1f}")  # Update the label text with the slider's current value, formatted to one decimal place
 
+    def update_user_data_check(self):
+         # Create a popup frame and store it as an instance attribute
+        self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+        # Create BooleanVar for checkboxes
+        self.checkbox1_var = ctk.BooleanVar()
+        self.checkbox2_var = ctk.BooleanVar()
+        self.check = ctk.CTkLabel(self.popup_frame, text="Are you sure you want to save the data?", font=("Arial", 16, "bold"))
+        self.check.pack(pady=10, padx=10)
+        # Create checkboxes
+        self.checkbox1 = ctk.CTkCheckBox(self.popup_frame, text="Yes", variable=self.checkbox1_var, command=self.update_user_data)
+        self.checkbox1.pack(side="left", pady=10, padx=(50, 10))
+
+        self.checkbox2 = ctk.CTkCheckBox(self.popup_frame, text="No", variable=self.checkbox2_var, command=self.update_user_data)
+        self.checkbox2.pack(side="right", pady=10, padx=10)
+
     def update_user_data(self):
-        username_data = self.user_manager.read_user(self.username)
-        if self.initial_state.get() == "AOO":
-            username_data["AOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
-            username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+        if self.checkbox1_var.get() and not self.checkbox2_var.get():
+            self.popup_frame.destroy()
+            username_data = self.user_manager.read_user(self.username)
+            if self.initial_state.get() == "AOO":
+                username_data["AOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
 
-        elif self.initial_state.get() == "VOO":
-            username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["VOO"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
-            username_data["VOO"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+            elif self.initial_state.get() == "VOO":
+                username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VOO"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VOO"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
 
-        elif self.initial_state.get() == "AAI":
-            username_data["AAI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["AAI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["AAI"]["Atrial Amplitude"] = self.atrial_amplitude.get()
-            username_data["AAI"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-            username_data["AAI"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
-            username_data["AAI"]["ARP"] = self.arp.get()
-            username_data["AAI"]["Hysteresis"] = self.hysteresis.get()
-            username_data["AAI"]["Rate Smoothing"] = self.rate_smoothing.get()
+            elif self.initial_state.get() == "AAI":
+                username_data["AAI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AAI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AAI"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AAI"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                username_data["AAI"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
+                username_data["AAI"]["ARP"] = self.arp.get()
+                username_data["AAI"]["Hysteresis"] = self.hysteresis.get()
+                username_data["AAI"]["Rate Smoothing"] = self.rate_smoothing.get()
 
-        elif self.initial_state.get() == "VVI":
-            username_data["VVI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["VVI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["VVI"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
-            username_data["VVI"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-            username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
-            username_data["VVI"]["VRP"] = self.vrp.get()
-            username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
-       
-        username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
-        self.user_manager.update_user_data(self.username, username_data)
-    def update_plot(self):
-        # Generate a new random y-value between 0 and 1
-        new_y_value = random.uniform(0, 1)
-
-        # Update the y_values deque
-        self.y_values.append(new_y_value)
-
-        # Shift the x-values to create a moving window effect
-        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
-        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
-
-        # Update the plot data with the new x and y values
-        self.line.set_ydata(self.y_values) # Update the y-data of the plot line
-        self.line.set_xdata(self.x_values) # Update the x-data of the plot line
-
-        # Set x-axis limits to show the last 3000 ms of data
-        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
-        self.ax.set_ylim(0, 1)  # Set Y-axis range
-
-        # Redraw the canvas with the updated plot
-        self.canvas.draw()
-
-        # Schedule the next update after 200 ms
-        self.master.after(200, self.update_plot)
+            elif self.initial_state.get() == "VVI":
+                username_data["VVI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VVI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VVI"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VVI"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+                username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
+                username_data["VVI"]["VRP"] = self.vrp.get()
+                username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
         
+            username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
+            self.user_manager.update_user_data(self.username, username_data)
+        else:
+            self.popup_frame.destroy()
+    
 class App:
     def __init__(self, root):
         self.root = root  # Store the root window (Tkinter root) in self.root
@@ -838,8 +924,8 @@ class App:
         self.create_user_page = None
         self.main_page = None
 
-        self.open_login_page()  # Open the login page as the default page when the app starts
-
+        #self.open_login_page()  # Open the login page as the default page when the app starts
+        self.open_main_page("aidan")  # Open the main page as the default page when the app starts
     def open_login_page(self, success_message=False):
         self.clear_page()  # Clear any existing widgets from the root window
         self.login_page = LoginPage(self.root, self.user_manager, self, success_message)  # Initialize and display the LoginPage, passing the root, user manager, app instance, and optional success message
