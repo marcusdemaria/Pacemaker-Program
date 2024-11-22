@@ -924,8 +924,8 @@ class App:
         self.create_user_page = None
         self.main_page = None
 
-        #self.open_login_page()  # Open the login page as the default page when the app starts
-        self.open_main_page("aidan")  # Open the main page as the default page when the app starts
+        self.open_login_page()  # Open the login page as the default page when the app starts
+        #self.open_main_page("aidan")  # Open the main page as the default page when the app starts
     def open_login_page(self, success_message=False):
         self.clear_page()  # Clear any existing widgets from the root window
         self.login_page = LoginPage(self.root, self.user_manager, self, success_message)  # Initialize and display the LoginPage, passing the root, user manager, app instance, and optional success message
