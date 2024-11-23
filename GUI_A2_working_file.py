@@ -56,11 +56,14 @@ class UserManager:
         if not os.path.exists(file_path):
             return None  # User does not exist
 
-        with open(file_path, "r") as file:
-            data = json.load(file)
-            # Decrypt the password before returning
-            data['password'] = self._decrypt_password(data['password'])
-            return data
+        try:
+            with open(file_path, "r") as file:
+                data = json.load(file)
+                # Decrypt the password before returning
+                data['password'] = self._decrypt_password(data['password'])
+                return data
+        except json.JSONDecodeError:
+            raise ValueError("Error decoding JSON file. Please check the file format.")
 
     def save_user(self, username, password):
         """Save a new user to their own JSON file."""
