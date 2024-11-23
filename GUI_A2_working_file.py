@@ -56,14 +56,11 @@ class UserManager:
         if not os.path.exists(file_path):
             return None  # User does not exist
 
-        try:
-            with open(file_path, "r") as file:
-                data = json.load(file)
-                # Decrypt the password before returning
-                data['password'] = self._decrypt_password(data['password'])
-                return data
-        except json.JSONDecodeError:
-            raise ValueError("Error decoding JSON file. Please check the file format.")
+        with open(file_path, "r") as file:
+            data = json.load(file)
+            # Decrypt the password before returning
+            data['password'] = self._decrypt_password(data['password'])
+            return data
 
     def save_user(self, username, password):
         """Save a new user to their own JSON file."""
@@ -118,7 +115,9 @@ class LoginPage:
         self.app = app  # Store the app reference to the main application
         self.success_message = success_message  # Whether to show a success message
         self.create_top_widgets()  #Call the function to create the interface elements
-        self.create_widgets()  #Call the function to create the interface elements   
+        self.create_widgets()  #Call the function to create the interface elements
+
+    
 
     def create_top_widgets(self):
         # Create a frame to contain the top bar
@@ -173,6 +172,8 @@ class LoginPage:
 
         # Start updating the time
         self.update_time()
+
+
 
     def update_time(self):
         if self.date_time_label.winfo_exists():
@@ -273,6 +274,7 @@ class LoginPage:
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
 
+
     def open_create_user_page(self):
         self.app.open_create_user_page() # Open the page to create a new user
 
@@ -338,11 +340,14 @@ class CreateUserPage:
         # Start updating the time
         self.update_time()
 
+
+
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
             self.date_time_label.configure(text=f"{formatted_datetime}")
             self.master.after(1000, self.update_time)  # Schedule the next update
+
 
     def create_widgets(self):
         # Create a frame that will fill the window screen
@@ -411,7 +416,7 @@ class CreateUserPage:
             dynamic_users_label = ctk.CTkLabel(user_frame, text=f"{total_users}/10", font=("Arial", 16))
             dynamic_users_label.pack(side="left")
 
-    # This might cause an issue with the sizing if the length of the error message is larger than the entry box
+    # this might cause an issue with the sizing if the length of the error message is larger than the entry box
     def handle_create_user(self):
         new_username = self.new_username_entry.get()
         new_password = self.new_password_entry.get()
@@ -518,12 +523,15 @@ class MainPage:
         # Start updating the time
         self.update_time()
 
+
+
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
             self.date_time_label.configure(text=f"{formatted_datetime}")
             self.master.after(1000, self.update_time)  # Schedule the next update
 
+   
     def create_widgets(self):
 
         container_frame = ctk.CTkFrame(self.master, fg_color="transparent")
@@ -587,17 +595,68 @@ class MainPage:
         # Initialize by hiding the electrogram frame
         self.electrogram_frame.grid_forget()
         self.show_edit_frame() 
-        
 
-        
-        
 
     def toggle_admin_mode(self):
-        self.admin_mode.set(not self.admin_mode.get()) # Change the admin_mode variable to its opposite value (toggle it)
-        if self.admin_mode.get(): # Update the button text based on the new state of admin mode
-            self.admin_mode_button.configure(text="Admin Mode: ON") # Change text of button to ON
-        else:  # If admin mode is OFF
-            self.admin_mode_button.configure(text="Admin Mode: OFF") # Change text of button to OFF
+        if not self.admin_mode.get():  # Admin Mode is OFF, prompt for a password
+            # Create a popup frame and store it as an instance attribute
+            self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+            self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            
+            # Create the label, entry, and submit button inside the popup frame
+            self.admin_label = ctk.CTkLabel(self.popup_frame, text="Enter Admin Password:", font=("Arial", 16, "bold"))  
+            self.admin_label.pack(pady=10, padx=15)  # Add padding to the label
+            
+            self.admin_password_entry = ctk.CTkEntry(self.popup_frame, show="*", font=("Arial", 16))  
+            self.admin_password_entry.pack(pady=10)  # Add padding to the entry field
+            
+            self.submit_button = ctk.CTkButton(
+                self.popup_frame, 
+                text="Submit", 
+                command=self.check_admin_password, 
+                font=("Arial", 16, "bold")
+            )  
+            self.submit_button.pack(pady=10)  # Add padding to the submit button
+        else:
+            # Incorrect password: disable admin mode and show an error message
+            self.admin_mode.set(False)
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+            self.edit_data_button.configure(state="disabled")
+            self.delete_user_button.configure(state="disabled")
+            self.update_edit_frame(self.initial_state.get())
+
+    def check_admin_password(self):
+        # Get the entered password
+        entered_password = self.admin_password_entry.get()  
+        
+        # Validate the entered password
+        if entered_password == "1234":  # Replace with a secure password
+            # Correct password: enable admin mode
+            self.admin_mode.set(True)
+            self.admin_mode_button.configure(text="Admin Mode: ON")
+            self.edit_data_button.configure(state="normal")
+            self.delete_user_button.configure(state="normal")
+            # Destroy the popup frame and its contents
+            self.popup_frame.destroy()
+            self.correct_password = ctk.CTkLabel(self.master, text="Correct Password", font=("Arial", 16, "bold"), text_color="green")
+            self.correct_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            self.master.after(3000, lambda: self.correct_password.destroy())
+        else:
+            # Incorrect password: disable admin mode and show an error message
+            self.admin_mode.set(False)
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+            self.edit_data_button.configure(state="disabled")
+            self.delete_user_button.configure(state="disabled")
+            # Destroy the popup frame and its contents
+            self.popup_frame.destroy()
+            self.incorrect_password = ctk.CTkLabel(self.master, text="Incorrect Password", font=("Arial", 16, "bold"), text_color="red")
+            self.incorrect_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            self.master.after(3000, lambda: self.incorrect_password.destroy())
+            
+        
+        
+
+        # Update the frame with the new admin state
         self.update_edit_frame(self.initial_state.get())
     
     def delete_current_user_check(self):
@@ -701,8 +760,6 @@ class MainPage:
             widget.destroy() # Remove the widget from the frame (to avoid duplication or clutter)
 
         username_data = self.user_manager.read_user(self.username)
-        
-        # Ensure the selected mode exists in the user data
         if mode not in username_data:
             username_data[mode] = {}
 
@@ -777,7 +834,6 @@ class MainPage:
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
             ]
-
         elif mode == "AOOR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Lower Rate Limit"])
@@ -800,7 +856,6 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-
         elif mode == "VOOR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Lower Rate Limit"])
@@ -823,7 +878,6 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-
         elif mode == "AAIR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Lower Rate Limit"])
@@ -856,7 +910,6 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-
         elif mode == "VVIR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VVIR"]["Lower Rate Limit"])
@@ -887,7 +940,7 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-                  
+            
         else:
             variables = []
 
@@ -964,7 +1017,7 @@ class MainPage:
                 username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
                 username_data["VVI"]["VRP"] = self.vrp.get()
                 username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
-        
+
             elif self.initial_state.get() == "AOOR":
                 username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["AOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -975,7 +1028,6 @@ class MainPage:
                 username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["AOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
-
             elif self.initial_state.get() == "VOOR":
                 username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["VOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -986,7 +1038,6 @@ class MainPage:
                 username_data["VOOR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["VOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
-
             elif self.initial_state.get() == "AAIR":
                 username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["AAIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -1002,7 +1053,6 @@ class MainPage:
                 username_data["AAIR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["AAIR"]["Response Factor"] = self.response_factor.get()
                 username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
-
             elif self.initial_state.get() == "VVIR":
                 username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["VVIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -1017,40 +1067,12 @@ class MainPage:
                 username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["VVIR"]["Response Factor"] = self.response_factor.get()
                 username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
+                
+            username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
+            self.user_manager.update_user_data(self.username, username_data)
+        else:
+            self.popup_frame.destroy()
        
-        username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
-        self.user_manager.update_user_data(self.username, username_data)
-        
-    def update_plot(self):
-        # Generate a new random y-value between 0 and 1
-        new_y_value = random.uniform(0, 1)
-
-        # Update the y_values deque
-        self.y_values.append(new_y_value)
-
-        # Shift the x-values to create a moving window effect
-        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
-        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
-
-        # Update the plot data with the new x and y values
-        self.line.set_ydata(self.y_values) # Update the y-data of the plot line
-        self.line.set_xdata(self.x_values) # Update the x-data of the plot line
-
-        # Set x-axis limits to show the last 3000 ms of data
-        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
-        self.ax.set_ylim(0, 1)  # Set Y-axis range
-
-        # Redraw the canvas with the updated plot
-        self.canvas.draw()
-
-        # Schedule the next update after 200 ms
-        self.master.after(200, self.update_plot)
-        
-        #    username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
-        #    self.user_manager.update_user_data(self.username, username_data)
-        #else:
-        #    self.popup_frame.destroy()
-    
 class App:
     def __init__(self, root):
         self.root = root  # Store the root window (Tkinter root) in self.root

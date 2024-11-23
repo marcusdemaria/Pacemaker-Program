@@ -97,7 +97,7 @@ class LoginPage:
         center_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
         # Login label (header) with custom font size
-        login_label = ctk.CTkLabel(center_frame, text="Welcome to the LeTron James PACEMAKER Login Page!!", font=("Arial", 24))
+        login_label = ctk.CTkLabel(center_frame, text="LeTron James PACEMAKER", font=("Arial", 24))
         login_label.pack(pady=(20, 10), padx=10, fill="both")
 
         # Username label

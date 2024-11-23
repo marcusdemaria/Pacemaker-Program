@@ -128,7 +128,7 @@ class MainPage:
         select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16, "bold")) # Create a label for selecting pacemaker modes.
         select_mode_label.grid(row=0, column=0, pady=1, padx=10, sticky="sw") # Place the mode label in the grid.
 
-        pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
+        pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI", "AOOR", "VOOR", "AAIR", "VVIR"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
         self.initial_state = tk.StringVar(value="AOO")  # Initialize the pacemaker mode variable with a default value of "AOO".
         pacemaker_state_optionmenu = ctk.CTkOptionMenu(container_frame, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
         pacemaker_state_optionmenu.grid(row=1, column=0, sticky="new", pady=1, padx=(10, 1)) # Place the option menu in the grid.
@@ -326,7 +326,9 @@ class MainPage:
             widget.destroy() # Remove the widget from the frame (to avoid duplication or clutter)
 
         username_data = self.user_manager.read_user(self.username)
-        
+        if mode not in username_data:
+            username_data[mode] = {}
+
         # Define the variables and their values based on the selected mode
         if mode == "AOO":
             # Initialize variables for the sliders
@@ -398,7 +400,112 @@ class MainPage:
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
             ]
-            
+        elif mode == "AOOR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["AOOR"]["Max Sensor Rate"])
+            self.atrial_amplitude = tk.DoubleVar(value=username_data["AOOR"]["Atrial Amplitude"])
+            self.atrial_pulse_width = tk.DoubleVar(value=username_data["AOOR"]["Atrial Pulse Width"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["AOOR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["AOOR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["AOOR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["AOOR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+        elif mode == "VOOR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["VOOR"]["Max Sensor Rate"])
+            self.atrial_amplitude = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Amplitude"])
+            self.atrial_pulse_width = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Pulse Width"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["VOOR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["VOOR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["VOOR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["VOOR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Ventricular Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+        elif mode == "AAIR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["AAIR"]["Max Sensor Rate"])
+            self.atrial_amplitude = tk.DoubleVar(value=username_data["AAIR"]["Atrial Amplitude"])
+            self.atrial_pulse_width = tk.DoubleVar(value=username_data["AAIR"]["Atrial Pulse Width"])
+            self.atrial_sensitivity = tk.DoubleVar(value=username_data["AAIR"]["Atrial Sensitivity"]) 
+            self.arp = tk.DoubleVar(value=username_data["AAIR"]["ARP"]) 
+            self.pvarp = tk.DoubleVar(value=username_data["AAIR"]["PVARP"])
+            self.hysteresis = tk.DoubleVar(value=username_data["AAIR"]["Hysteresis"])  
+            self.rate_smoothing = tk.DoubleVar(value=username_data["AAIR"]["Rate Smoothing"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["AAIR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["AAIR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["AAIR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["AAIR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Atrial Sensitivity", 0, 5.0, self.atrial_sensitivity, 0.5),
+                ("ARP", 100, 500, self.arp, 10),
+                ("PVARP", 150, 500, self.pvarp, 10),
+                ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
+                ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+        elif mode == "VVIR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["VVIR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["VVIR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["VVIR"]["Max Sensor Rate"])
+            self.ventricular_amplitude = tk.DoubleVar(value=username_data["VVIR"]["Ventricular Amplitude"])
+            self.ventricular_pulse_width = tk.DoubleVar(value=username_data["VVIR"]["Ventricular Pulse Width"])
+            self.ventricular_sensitivity = tk.DoubleVar(value=username_data["VVIR"]["Ventricular Sensitivity"])
+            self.vrp = tk.DoubleVar(value=username_data["VVIR"]["VRP"])
+            self.hysteresis = tk.DoubleVar(value=username_data["VVIR"]["Hysteresis"])
+            self.rate_smoothing = tk.DoubleVar(value=username_data["VVIR"]["Rate Smoothing"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["VVIR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["VVIR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["VVIR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["VVIR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
+                ("Ventricular Sensitivity", 0, 5.0, self.ventricular_sensitivity, 0.5),
+                ("VRP", 100, 500, self.vrp, 10),
+                ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
+                ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
             
         else:
             variables = []
@@ -476,7 +583,57 @@ class MainPage:
                 username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
                 username_data["VVI"]["VRP"] = self.vrp.get()
                 username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
-        
+
+            elif self.initial_state.get() == "AOOR":
+                username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["AOOR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AOOR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                username_data["AOOR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["AOOR"]["Response Factor"] = self.response_factor.get()
+                username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "VOOR":
+                username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["VOOR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VOOR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+                username_data["VOOR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["VOOR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["VOOR"]["Response Factor"] = self.response_factor.get()
+                username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "AAIR":
+                username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AAIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AAIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["AAIR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AAIR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                username_data["AAIR"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
+                username_data["AAIR"]["ARP"] = self.arp.get()
+                username_data["AAIR"]["PVARP"] = self.pvarp.get()
+                username_data["AAIR"]["Hysteresis"] = self.hysteresis.get()
+                username_data["AAIR"]["Rate Smoothing"] = self.rate_smoothing.get()
+                username_data["AAIR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["AAIR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["AAIR"]["Response Factor"] = self.response_factor.get()
+                username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "VVIR":
+                username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VVIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VVIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["VVIR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VVIR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+                username_data["VVIR"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
+                username_data["VVIR"]["VRP"] = self.vrp.get()
+                username_data["VVIR"]["Hysteresis"] = self.hysteresis.get()
+                username_data["VVIR"]["Rate Smoothing"] = self.rate_smoothing.get()
+                username_data["VVIR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["VVIR"]["Response Factor"] = self.response_factor.get()
+                username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
+                
             username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
             self.user_manager.update_user_data(self.username, username_data)
         else:
