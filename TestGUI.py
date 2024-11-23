@@ -79,7 +79,11 @@ class UserManager:
             "AOO": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1},
             "VOO": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1},
             "AAI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12},
-            "VVI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12}
+            "VVI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12},
+            "AOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "VOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "AAIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "PVARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "VVIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
             # You can add more user-specific data here
         }
 
@@ -109,7 +113,6 @@ class UserManager:
                     users[username] = user_data['password']
         return users
 
-
 class LoginPage:
     def __init__(self, master, user_manager, app, success_message=False):  # Initialize the login page
         self.master = master # The main window that contains everything
@@ -117,9 +120,7 @@ class LoginPage:
         self.app = app  # Store the app reference to the main application
         self.success_message = success_message  # Whether to show a success message
         self.create_top_widgets()  #Call the function to create the interface elements
-        self.create_widgets()  #Call the function to create the interface elements
-
-    
+        self.create_widgets()  #Call the function to create the interface elements   
 
     def create_top_widgets(self):
         # Create a frame to contain the top bar
@@ -136,7 +137,7 @@ class LoginPage:
         pacemaker_connection = ctk.CTkLabel(pacemaker_connection_frame, text="Pacemaker Connection:", font=("Arial", 14, "bold"))
         pacemaker_connection.pack(side="left", padx=5)
 
-        connection_status = False  # Need to change this still
+        connection_status = True  # Need to change this still
         # Load the Pacemaker Icon
         if connection_status==True:
             pacemaker_icon_path = "icons/connected.png"
@@ -175,8 +176,6 @@ class LoginPage:
         # Start updating the time
         self.update_time()
 
-
-
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
@@ -201,7 +200,7 @@ class LoginPage:
         center_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew")
 
         # Login label (header) with custom font size
-        login_label = ctk.CTkLabel(center_frame, text="Welcome to the LeTron James PACEMAKER Login Page!!", font=("Arial", 24))
+        login_label = ctk.CTkLabel(center_frame, text="LeTron James PACEMAKER", font=("Arial", 24))
         login_label.pack(pady=(20, 10), padx=10, fill="both")
 
         # Username label
@@ -276,7 +275,6 @@ class LoginPage:
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
 
-
     def open_create_user_page(self):
         self.app.open_create_user_page() # Open the page to create a new user
 
@@ -285,12 +283,73 @@ class CreateUserPage:
         self.master = master  # Reference to the main window (the parent window)
         self.user_manager = user_manager  # Reference to the user manager for saving and reading user data
         self.app = app  # Reference to the main application
+        self.create_top_widgets()
         self.create_widgets()  # Call the function to create the interface elements
+
+    def create_top_widgets(self):
+        # Create a frame to contain the top bar
+        container_frame = ctk.CTkFrame(self.master, height=25, fg_color="#000000")
+        container_frame.pack(fill="x", pady=2)
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.columnconfigure(1, weight=1)
+        container_frame.columnconfigure(2, weight=1)
+
+        # Left section: Pacemaker Connection
+        pacemaker_connection_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
+        pacemaker_connection_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")  # Use a nested frame for label + icon
+
+        pacemaker_connection = ctk.CTkLabel(pacemaker_connection_frame, text="Pacemaker Connection:", font=("Arial", 14, "bold"))
+        pacemaker_connection.pack(side="left", padx=5)
+
+        connection_status = True  # Need to change this still
+        # Load the Pacemaker Icon
+        if connection_status==True:
+            pacemaker_icon_path = "icons/connected.png"
+        else:
+            pacemaker_icon_path = "icons/disconnected.png"  # Path to the saved pacemaker icon
+        pacemaker_image = Image.open(pacemaker_icon_path).resize((20, 20))  # Resize as needed
+        pacemaker_icon = ImageTk.PhotoImage(pacemaker_image)
+
+        # Pacemaker Icon Label
+        pacemaker_icon_label = ctk.CTkLabel(pacemaker_connection_frame, image=pacemaker_icon, text="")
+        pacemaker_icon_label.image = pacemaker_icon  # Prevent garbage collection
+        pacemaker_icon_label.pack(side="left")
+
+        # Middle section: Date and Time
+        self.date_time_label = ctk.CTkLabel(container_frame, text="", font=("Arial", 14), anchor="center")
+        self.date_time_label.grid(row=0, column=1, padx=10, pady=10)
+
+        # Right section: Battery Life
+        battery_life_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
+        battery_life_frame.grid(row=0, column=2, padx=10, pady=10, sticky="e")  # Use a nested frame for label + icon
+
+        # Battery Life Label
+        battery_life = ctk.CTkLabel(battery_life_frame, text="Battery Life:", font=("Arial", 14))
+        battery_life.pack(side="left", padx=5)
+
+        # Load the Battery Icon
+        battery_icon_path = "icons/battery.png"  # Path to the saved battery icon
+        battery_image = Image.open(battery_icon_path).resize((20, 20))  # Resize as needed
+        battery_icon = ImageTk.PhotoImage(battery_image)
+
+        # Battery Icon Label
+        battery_icon_label = ctk.CTkLabel(battery_life_frame, image=battery_icon, text="")
+        battery_icon_label.image = battery_icon  # Prevent garbage collection
+        battery_icon_label.pack(side="left")
+
+        # Start updating the time
+        self.update_time()
+
+    def update_time(self):
+        if self.date_time_label.winfo_exists():
+            formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
+            self.date_time_label.configure(text=f"{formatted_datetime}")
+            self.master.after(1000, self.update_time)  # Schedule the next update
 
     def create_widgets(self):
         # Create a frame that will fill the window screen
-        container_frame = ctk.CTkFrame(self.master)
-        container_frame.pack(fill="both", expand=True) # Make it expand to fill the screen
+        container_frame = ctk.CTkFrame(self.master, width=200, height= 300, corner_radius=15, fg_color="#ADD8E6")
+        container_frame.pack(pady=30) # Make it expand to fill the screen
 
         # Configure a grid system inside the container for proper resizing
         container_frame.columnconfigure(0, weight=1)  # Allow column to stretch
@@ -299,11 +358,11 @@ class CreateUserPage:
         container_frame.rowconfigure(2, weight=1)  # For password label
         container_frame.rowconfigure(3, weight=1)  # For error label
         container_frame.rowconfigure(4, weight=1)  # For buttons
-        container_frame.rowconfigure(5, weight=1)  # For the exit button
+        
 
         # Center Frame to contain the create user form
         center_frame = ctk.CTkFrame(container_frame)
-        center_frame.grid(row=1, column=0, padx=20, pady=20, sticky="nsew") # Positioned at the center
+        center_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew") # Positioned at the center
 
         # Label for the create user page
         create_user_label = ctk.CTkLabel(center_frame, text="Create a New User", font=("Arial", 24))
@@ -311,19 +370,19 @@ class CreateUserPage:
 
         # Label for the new username input
         new_username_label = ctk.CTkLabel(center_frame, text="New Username:", font=("Arial", 18))
-        new_username_label.pack(pady=(5, 2))
+        new_username_label.pack(pady=(5, 2), padx=52, anchor="w") # Add padding and align to the left
 
         # Entry box for the new username (with increased size)
         self.new_username_entry = ctk.CTkEntry(center_frame, height=40, width=300, font=("Arial", 18))  # Increased size
-        self.new_username_entry.pack(pady=10) # Add padding around the entry field
+        self.new_username_entry.pack(pady=(2,10),padx=50) # Add padding around the entry field
 
         # New Password label and entry
         new_password_label = ctk.CTkLabel(center_frame, text="New Password:", font=("Arial", 18))
-        new_password_label.pack(pady=(5, 2)) # Add padding between label and entry field
+        new_password_label.pack(pady=(5, 2), padx=52, anchor="w") # Add padding between label and entry field
 
         # Entry box for the new password (hidden characters with '*')
         self.new_password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))  # Password hidden
-        self.new_password_entry.pack(pady=10)  # Add padding around the entry field
+        self.new_password_entry.pack(pady=(2,10), padx=50)  # Add padding around the entry field
 
         # Label for displaying error messages (initially empty)
         self.create_user_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
@@ -342,10 +401,19 @@ class CreateUserPage:
         back_button = ctk.CTkButton(center_frame, text="Back", command=self.app.open_login_page, height=50, width=300, font=("Arial", 18))
         back_button.pack(pady=(10, 20))  # Add padding for the back button
 
-        # Exit button at the bottom to close the window
-        exit_button = ctk.CTkButton(container_frame, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809")
-        exit_button.grid(row=5, column=0, pady=(10, 20))  # Position the exit button at the bottom
+        user_frame = ctk.CTkFrame(center_frame, fg_color="transparent")
+        user_frame.pack(pady=(10, 20))
+        total_users = len(os.listdir(self.user_manager.user_dir))
+        static_users_label = ctk.CTkLabel(user_frame, text=f"Total Users: ", font=("Arial", 16))
+        static_users_label.pack(side="left")
+        if total_users >= 10:
+            dynamic_users_label = ctk.CTkLabel(user_frame, text=f"{total_users}/10", font=("Arial", 16), text_color="red")
+            dynamic_users_label.pack(side="left")
+        else:
+            dynamic_users_label = ctk.CTkLabel(user_frame, text=f"{total_users}/10", font=("Arial", 16))
+            dynamic_users_label.pack(side="left")
 
+    # This might cause an issue with the sizing if the length of the error message is larger than the entry box
     def handle_create_user(self):
         new_username = self.new_username_entry.get()
         new_password = self.new_password_entry.get()
@@ -367,7 +435,7 @@ class CreateUserPage:
 
     def show_error(self, message):
         self.create_user_error_label.configure(text="", fg_color="transparent") # Clear any previous error messages
-        self.master.after(100, lambda: self.create_user_error_label.configure(text=message, fg_color="red")) # After 100 ms, show the error message
+        self.master.after(100, lambda: self.create_user_error_label.configure(text=message, text_color="red")) # After 100 ms, show the error message
         self.new_username_entry.delete(0, tk.END) # Clear the new username entry field
         self.new_password_entry.delete(0, tk.END) # Clear the new password entry field
 
@@ -376,8 +444,11 @@ class MainPage:
         self.master = master # Reference to the main window
         self.app = app # Reference to the main application
         self.username = username # Store the username for the current user
-        self.create_widgets() # Call the function to create the interface elements
+        
         self.user_manager = user_manager  # Ensure user_manager is passed to the main page
+        
+        
+        #initial graphing data
         self.y_values = deque([0] * 30, maxlen=30)  # Y-axis values for the plot
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
 
@@ -392,8 +463,81 @@ class MainPage:
 
         self.line, = self.ax.plot(self.x_values, self.y_values)  #Plot the initial x and y values (empty or default data)
 
+        self.create_top_widgets()
+        self.create_widgets() # Call the function to create the interface elements
+
+    def create_top_widgets(self):
+        # Create a frame to contain the top bar
+        container_frame = ctk.CTkFrame(self.master, height=25, fg_color="#000000")
+        container_frame.pack(fill="x", pady=2)
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.columnconfigure(1, weight=1)
+        container_frame.columnconfigure(2, weight=1)
+
+        # Left section: Pacemaker Connection
+        pacemaker_connection_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
+        pacemaker_connection_frame.grid(row=0, column=0, padx=10, pady=10, sticky="w")  # Use a nested frame for label + icon
+
+        pacemaker_connection = ctk.CTkLabel(pacemaker_connection_frame, text="Pacemaker Connection:", font=("Arial", 14, "bold"))
+        pacemaker_connection.pack(side="left", padx=5)
+
+        connection_status = True  # Need to change this still
+        # Load the Pacemaker Icon
+        if connection_status==True:
+            pacemaker_icon_path = "icons/connected.png"
+        else:
+            pacemaker_icon_path = "icons/disconnected.png"  # Path to the saved pacemaker icon
+        pacemaker_image = Image.open(pacemaker_icon_path).resize((20, 20))  # Resize as needed
+        pacemaker_icon = ImageTk.PhotoImage(pacemaker_image)
+
+        # Pacemaker Icon Label
+        pacemaker_icon_label = ctk.CTkLabel(pacemaker_connection_frame, image=pacemaker_icon, text="")
+        pacemaker_icon_label.image = pacemaker_icon  # Prevent garbage collection
+        pacemaker_icon_label.pack(side="left")
+
+        # Middle section: Date and Time
+        self.date_time_label = ctk.CTkLabel(container_frame, text="", font=("Arial", 14), anchor="center")
+        self.date_time_label.grid(row=0, column=1, padx=10, pady=10)
+
+        # Right section: Battery Life
+        battery_life_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
+        battery_life_frame.grid(row=0, column=2, padx=10, pady=10, sticky="e")  # Use a nested frame for label + icon
+
+        # Battery Life Label
+        battery_life = ctk.CTkLabel(battery_life_frame, text="Battery Life:", font=("Arial", 14))
+        battery_life.pack(side="left", padx=5)
+
+        # Load the Battery Icon
+        battery_icon_path = "icons/battery.png"  # Path to the saved battery icon
+        battery_image = Image.open(battery_icon_path).resize((20, 20))  # Resize as needed
+        battery_icon = ImageTk.PhotoImage(battery_image)
+
+        # Battery Icon Label
+        battery_icon_label = ctk.CTkLabel(battery_life_frame, image=battery_icon, text="")
+        battery_icon_label.image = battery_icon  # Prevent garbage collection
+        battery_icon_label.pack(side="left")
+
+        # Start updating the time
+        self.update_time()
+
+    def update_time(self):
+        if self.date_time_label.winfo_exists():
+            formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
+            self.date_time_label.configure(text=f"{formatted_datetime}")
+            self.master.after(1000, self.update_time)  # Schedule the next update
+
+    def create_widgets(self):
+
+        container_frame = ctk.CTkFrame(self.master, fg_color="transparent")
+        container_frame.pack(fill="both", expand=True)
+        # Setting up the Grid Layout
+        container_frame.columnconfigure((0, 1), weight=1)
+        container_frame.columnconfigure((2, 3), weight=2)
+        container_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
+
+        #setting up graph area
         # Create a canvas widget to display the matplotlib figure within the tkinter frame.
-        self.electrogram_frame = ctk.CTkFrame(self.master)
+        self.electrogram_frame = ctk.CTkFrame(container_frame)
         self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
 
         # Create the canvas for the plot
@@ -402,88 +546,50 @@ class MainPage:
         # Attach the canvas to the tkinter grid, center it within the frame with padding.
         self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
 
-        # Configure grid for the electrogram frame to allow for padding
-        self.electrogram_frame.columnconfigure(0, weight=1)
-        self.electrogram_frame.rowconfigure(0, weight=1)
+        # Frame for editing parameters
+        self.edit_frame = ctk.CTkScrollableFrame(container_frame)
+        self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        
+         
+        #Setting up the rest of the area
 
-        # Initialize by hiding the electrogram frame
-        self.electrogram_frame.grid_forget()
-        self.show_edit_frame()
-
-        # Microcontroller status label
-        self.microcontroller_status_label = ctk.CTkLabel(self.master, text="Pacemaker Status: Checking...", font=("Arial", 16), fg_color="transparent")
-        self.microcontroller_status_label.grid(row=1, column=3, pady=2)
-
-        # Start checking for microcontroller connection
-        self.check_microcontroller()
-
-    def check_microcontroller(self):
-        # Define a function to continuously check for connected serial ports (microcontroller).
-        def check_ports():
-            ports = serial.tools.list_ports.comports() # Get a list of all connected serial ports.
-            # If any ports are found, update the status label to "Connected".
-            if len(ports) > 0:
-                if self.microcontroller_status_label.winfo_exists():
-                    self.microcontroller_status_label.configure(text="Pacemaker Status: Connected", fg_color="transparent")
-            else:
-                # If no ports are found, update the status label to "Not Connected".
-                if self.microcontroller_status_label.winfo_exists():
-                    self.microcontroller_status_label.configure(text="Pacemaker Status: Not Connected", fg_color="transparent")
-            self.master.after(1000, check_ports) # Check again after 1 second (1000 ms).
-        check_ports() # Start the check_ports function for the first time.
-
-    def create_widgets(self):
-        # Setting up the Grid Layout
-        self.master.columnconfigure((0, 1), weight=1)
-        self.master.columnconfigure((2, 3), weight=2)
-        self.master.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
-
-        formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S") # Get the current date and time and format it as a string.
-        date_time_label = ctk.CTkLabel(self.master, text=f"{formatted_datetime}", font=("Arial", 16)) # Create a label to display the date and time.
-        date_time_label.grid(row=0, column=0, columnspan=2, pady=2) # Place the date-time label in the grid at the specified position.
-
-        username_label = ctk.CTkLabel(self.master, text=f"Logged in as: {self.username}", font=("Arial", 16))  # Create a label that shows the username of the logged-in user.
-        username_label.grid(row=0, column=3, columnspan=2, pady=2)  # Place the username label in the grid.
-
-        select_mode_label = ctk.CTkLabel(self.master, text="Select Mode", font=("Arial", 16)) # Create a label for selecting pacemaker modes.
+        select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16)) # Create a label for selecting pacemaker modes.
         select_mode_label.grid(row=1, column=0, columnspan=2, pady=2) # Place the mode label in the grid.
 
-        pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
+        pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI", "AOOR", "VOOR", "AAIR", "VVIR"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
         self.initial_state = tk.StringVar(value="AOO")  # Initialize the pacemaker mode variable with a default value of "AOO".
-        pacemaker_state_optionmenu = ctk.CTkOptionMenu(self.master, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
+        pacemaker_state_optionmenu = ctk.CTkOptionMenu(container_frame, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
         pacemaker_state_optionmenu.grid(row=2, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the option menu in the grid.
 
         # Segmented Button for Show Electrogram and Edit Parameters
-        self.segmented_button = ctk.CTkSegmentedButton(self.master, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
+        self.segmented_button = ctk.CTkSegmentedButton(container_frame, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
         self.segmented_button.grid(row=3, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))  # Place the segmented button in the grid
         self.segmented_button.set("Edit Parameters") # Set the default selection to "Edit Parameters"
 
-        edit_data_button = ctk.CTkButton(self.master, text="Update Data", command=self.update_user_data) # Create a button to export data
+        edit_data_button = ctk.CTkButton(container_frame, text="Update Data", command=self.update_user_data) # Create a button to export data
         edit_data_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        send_data_button = ctk.CTkButton(self.master, text="Send to Pacemaker") # Create a button to send data to the pacemaker
+        send_data_button = ctk.CTkButton(container_frame, text="Send to Pacemaker") # Create a button to send data to the pacemaker
         send_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        logout_button = ctk.CTkButton(self.master, text="Logout", command=self.app.open_login_page) # Create a button to log out
+        logout_button = ctk.CTkButton(container_frame, text="Logout", command=self.app.open_login_page) # Create a button to log out
         logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        delete_user_button = ctk.CTkButton(self.master, text="Delete User", command=self.delete_current_user) # Create a button to delete the current user
+        delete_user_button = ctk.CTkButton(container_frame, text="Delete User", command=self.delete_current_user) # Create a button to delete the current user
         delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
-        exit_button = ctk.CTkButton(self.master, text="Exit", command=self.master.destroy, fg_color="red", hover_color="#bd1809") # Create an exit button to close the app
+        exit_button = ctk.CTkButton(container_frame, text="Exit", command=container_frame.destroy, fg_color="red", hover_color="#bd1809") # Create an exit button to close the app
         exit_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
 
         # Admin Mode Toggle Button
         self.admin_mode = tk.BooleanVar(value=False) # Initialize a Boolean variable to track the state of admin mode (OFF by default)
-        admin_mode_button = ctk.CTkButton(self.master, text="Admin Mode: OFF", command=self.toggle_admin_mode) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
+        admin_mode_button = ctk.CTkButton(container_frame, text="Admin Mode: OFF", command=self.toggle_admin_mode) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
         admin_mode_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the button in the grid layout at row 8, column 0, spanning 2 columns with padding
         self.admin_mode_button = admin_mode_button # Store the reference to the button in self.admin_mode_button for later use
 
-        # Frame for editing parameters
-        self.edit_frame = ctk.CTkScrollableFrame(self.master)
-
-       
-        
+        # Initialize by hiding the electrogram frame
+        self.electrogram_frame.grid_forget()
+        self.show_edit_frame()        
 
     def toggle_admin_mode(self):
         self.admin_mode.set(not self.admin_mode.get()) # Change the admin_mode variable to its opposite value (toggle it)
@@ -550,6 +656,10 @@ class MainPage:
 
         username_data = self.user_manager.read_user(self.username)
         
+        # Ensure the selected mode exists in the user data
+        if mode not in username_data:
+            username_data[mode] = {}
+
         # Define the variables and their values based on the selected mode
         if mode == "AOO":
             # Initialize variables for the sliders
@@ -621,8 +731,117 @@ class MainPage:
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
             ]
-            
-            
+
+        elif mode == "AOOR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["AOOR"]["Max Sensor Rate"])
+            self.atrial_amplitude = tk.DoubleVar(value=username_data["AOOR"]["Atrial Amplitude"])
+            self.atrial_pulse_width = tk.DoubleVar(value=username_data["AOOR"]["Atrial Pulse Width"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["AOOR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["AOOR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["AOOR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["AOOR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+
+        elif mode == "VOOR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["VOOR"]["Max Sensor Rate"])
+            self.atrial_amplitude = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Amplitude"])
+            self.atrial_pulse_width = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Pulse Width"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["VOOR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["VOOR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["VOOR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["VOOR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Ventricular Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+
+        elif mode == "AAIR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["AAIR"]["Max Sensor Rate"])
+            self.atrial_amplitude = tk.DoubleVar(value=username_data["AAIR"]["Atrial Amplitude"])
+            self.atrial_pulse_width = tk.DoubleVar(value=username_data["AAIR"]["Atrial Pulse Width"])
+            self.atrial_sensitivity = tk.DoubleVar(value=username_data["AAIR"]["Atrial Sensitivity"]) 
+            self.arp = tk.DoubleVar(value=username_data["AAIR"]["ARP"]) 
+            self.pvarp = tk.DoubleVar(value=username_data["AAIR"]["PVARP"])
+            self.hysteresis = tk.DoubleVar(value=username_data["AAIR"]["Hysteresis"])  
+            self.rate_smoothing = tk.DoubleVar(value=username_data["AAIR"]["Rate Smoothing"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["AAIR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["AAIR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["AAIR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["AAIR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
+                ("Atrial Sensitivity", 0, 5.0, self.atrial_sensitivity, 0.5),
+                ("ARP", 100, 500, self.arp, 10),
+                ("PVARP", 150, 500, self.pvarp, 10),
+                ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
+                ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+
+        elif mode == "VVIR":
+            # Initialize variables for the sliders
+            self.lower_rate_limit = tk.DoubleVar(value=username_data["VVIR"]["Lower Rate Limit"])
+            self.upper_rate_limit = tk.DoubleVar(value=username_data["VVIR"]["Upper Rate Limit"])
+            self.max_sensor_rate = tk.DoubleVar(value=username_data["VVIR"]["Max Sensor Rate"])
+            self.ventricular_amplitude = tk.DoubleVar(value=username_data["VVIR"]["Ventricular Amplitude"])
+            self.ventricular_pulse_width = tk.DoubleVar(value=username_data["VVIR"]["Ventricular Pulse Width"])
+            self.ventricular_sensitivity = tk.DoubleVar(value=username_data["VVIR"]["Ventricular Sensitivity"])
+            self.vrp = tk.DoubleVar(value=username_data["VVIR"]["VRP"])
+            self.hysteresis = tk.DoubleVar(value=username_data["VVIR"]["Hysteresis"])
+            self.rate_smoothing = tk.DoubleVar(value=username_data["VVIR"]["Rate Smoothing"])
+            self.activity_threshold = tk.DoubleVar(value=username_data["VVIR"]["Activity Threshold"])
+            self.reaction_time = tk.DoubleVar(value=username_data["VVIR"]["Reaction Time"])
+            self.response_factor = tk.DoubleVar(value=username_data["VVIR"]["Response Factor"])
+            self.recovery_time = tk.DoubleVar(value=username_data["VVIR"]["Recovery Time"])
+            variables = [
+                ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
+                ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
+                ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
+                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
+                ("Ventricular Sensitivity", 0, 5.0, self.ventricular_sensitivity, 0.5),
+                ("VRP", 100, 500, self.vrp, 10),
+                ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
+                ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
+                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Reaction Time", 10, 50, self.reaction_time, 5),
+                ("Response Factor", 1, 16, self.response_factor, 1),
+                ("Recovery Time", 2, 16, self.recovery_time, 1)
+            ]
+                  
         else:
             variables = []
 
@@ -681,6 +900,59 @@ class MainPage:
             username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
             username_data["VVI"]["VRP"] = self.vrp.get()
             username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
+        
+        elif self.initial_state.get() == "AOOR":
+            username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+            username_data["AOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+            username_data["AOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+            username_data["AOOR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+            username_data["AOOR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+            username_data["AOOR"]["Activity Threshold"] = self.activity_threshold.get()
+            username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
+            username_data["AOOR"]["Response Factor"] = self.response_factor.get()
+            username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
+
+        elif self.initial_state.get() == "VOOR":
+            username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+            username_data["VOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+            username_data["VOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+            username_data["VOOR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+            username_data["VOOR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+            username_data["VOOR"]["Activity Threshold"] = self.activity_threshold.get()
+            username_data["VOOR"]["Reaction Time"] = self.reaction_time.get()
+            username_data["VOOR"]["Response Factor"] = self.response_factor.get()
+            username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
+
+        elif self.initial_state.get() == "AAIR":
+            username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+            username_data["AAIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+            username_data["AAIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+            username_data["AAIR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+            username_data["AAIR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+            username_data["AAIR"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
+            username_data["AAIR"]["ARP"] = self.arp.get()
+            username_data["AAIR"]["PVARP"] = self.pvarp.get()
+            username_data["AAIR"]["Hysteresis"] = self.hysteresis.get()
+            username_data["AAIR"]["Rate Smoothing"] = self.rate_smoothing.get()
+            username_data["AAIR"]["Activity Threshold"] = self.activity_threshold.get()
+            username_data["AAIR"]["Reaction Time"] = self.reaction_time.get()
+            username_data["AAIR"]["Response Factor"] = self.response_factor.get()
+            username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
+
+        elif self.initial_state.get() == "VVIR":
+            username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+            username_data["VVIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+            username_data["VVIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+            username_data["VVIR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+            username_data["VVIR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+            username_data["VVIR"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
+            username_data["VVIR"]["VRP"] = self.vrp.get()
+            username_data["VVIR"]["Hysteresis"] = self.hysteresis.get()
+            username_data["VVIR"]["Rate Smoothing"] = self.rate_smoothing.get()
+            username_data["VVIR"]["Activity Threshold"] = self.activity_threshold.get()
+            username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
+            username_data["VVIR"]["Response Factor"] = self.response_factor.get()
+            username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
        
         username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
         self.user_manager.update_user_data(self.username, username_data)
