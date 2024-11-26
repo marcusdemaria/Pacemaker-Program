@@ -1,6 +1,6 @@
 {
     "username": "aidan",
-    "password": "gAAAAABnRRYsr-kMJlgsCX-42CSTiMvnJvgYw30alEf8hYpy79_ONvZn_85H3LKkIOdNsz2FLzAPLusOAAGIEPNia1VQ_Vci4Q==",
+    "password": "gAAAAABnRTvwmm6XByd2yCEkBuxCKJS9WjyAX7bibvWjrSAuqqyDDLUjEMDhCWhNsnk8Lyin9VyfUMtZsnpWMTjUD9CYeaO_HA==",
     "AOO": {
         "Lower Rate Limit": 90.0,
         "Upper Rate Limit": 120.0,
@@ -56,20 +56,20 @@
         "Recovery Time": 2
     },
     "AAIR": {
-        "Lower Rate Limit": 60,
-        "Upper Rate Limit": 120,
-        "Max Sensor Rate": 175,
-        "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 1,
+        "Lower Rate Limit": 60.0,
+        "Upper Rate Limit": 120.0,
+        "Max Sensor Rate": 175.0,
+        "Atrial Amplitude": 2.5,
+        "Atrial Pulse Width": 1.0,
         "Atrial Sensitivity": 2.5,
-        "ARP": 250,
-        "PVARP": 250,
+        "ARP": 250.0,
+        "PVARP": 250.0,
         "Hysteresis": 3.0,
-        "Rate Smoothing": 12,
+        "Rate Smoothing": 12.0,
         "Activity Threshold": 2.5,
-        "Reaction Time": 10,
-        "Response Factor": 8,
-        "Recovery Time": 2
+        "Reaction Time": 10.0,
+        "Response Factor": 8.0,
+        "Recovery Time": 2.0
     },
     "VVIR": {
         "Lower Rate Limit": 60,

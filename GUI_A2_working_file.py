@@ -703,8 +703,9 @@ class MainPage:
 
     def segment_button_callback(self, value): 
         if value == "Show Electrogram":
-            self.show_electrogram() # Call the function to show the electrogram frame
             self.reset_plot() # Reset the plot when electrogram is shown
+            self.show_electrogram() # Call the function to show the electrogram frame
+            
         elif value == "Edit Parameters":
             self.show_edit_frame() # Call the function to show the parameter editing frame
 

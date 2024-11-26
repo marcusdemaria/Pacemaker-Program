@@ -295,41 +295,44 @@ class MainPage:
     def update_plot(self):
         #send the data
         if self.initial_state.get() == "AOO":
-            self.send_packet(1, 0, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+            self.send_packet(1, 1, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "VOO":
-            self.send_packet(1, 0, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+                
+            self.send_packet(1, 1, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "AAI":
-            self.send_packet(1, 0, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+                
+            self.send_packet(1, 1, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "VVI":
-            self.send_packet(1, 0, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+                
+            self.send_packet(1, 1, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "AOOR":
-            self.send_packet(1, 0, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+                
+            self.send_packet(1, 1, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         elif self.initial_state.get() == "VOOR":
-            self.send_packet(1, 0, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+            self.send_packet(1, 1, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         elif self.initial_state.get() == "AAIR":
-            self.send_packet(1, 0, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+            self.send_packet(1, 1, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         elif self.initial_state.get() == "VVIR":
-            self.send_packet(1, 0, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+            self.send_packet(1, 1, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         # recieve the data
         raw_data = self.ser.read(32)  # Read exactly 32 bytes
         if len(raw_data) == 32:
-            #unpacking the data
-            
+            #unopacking the data
             format_string = '16Bdd'  # 16 unsigned bytes (B) and 2 double-precision floats (d)
             unpacked_data = struct.unpack(format_string, raw_data)
 
         
         # Generate a new random y-value between 0 and 1
         new_y_value = unpacked_data[16]  # Use the unpacked float variable as the new y-value
-
+        print(new_y_value)
         # Update the y_values deque
         self.y_values.append(new_y_value)
 
@@ -383,7 +386,7 @@ class MainPage:
             variables = [
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
-                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Amplitude", 0.5, 10, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1)
             ]
             
@@ -397,7 +400,7 @@ class MainPage:
             variables = [
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
-                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Amplitude", 0.5, 10, self.ventricular_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
             ]
             
@@ -416,9 +419,9 @@ class MainPage:
             variables = [
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
-                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Amplitude", 0.5, 10, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Atrial Sensitivity", 0, 5.0, self.atrial_sensitivity, 0.5),
+                ("Atrial Sensitivity", 1, 10, self.atrial_sensitivity, 1),
                 ("ARP", 100, 500, self.arp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
@@ -430,16 +433,16 @@ class MainPage:
             self.upper_rate_limit = tk.DoubleVar(value=username_data["VVI"]["Upper Rate Limit"])
             self.ventricular_amplitude = tk.DoubleVar(value=username_data["VVI"]["Ventricular Amplitude"])
             self.ventricular_pulse_width = tk.DoubleVar(value=username_data["VVI"]["Ventricular Pulse Width"])
-            self.ventrical_sensitivity = tk.DoubleVar(value=username_data["VVI"]["Ventricular Sensitivity"]) 
+            self.ventricular_sensitivity = tk.DoubleVar(value=username_data["VVI"]["Ventricular Sensitivity"]) 
             self.vrp = tk.DoubleVar(value=username_data["VVI"]["VRP"])  
             self.hysteresis = tk.DoubleVar(value=username_data["VVI"]["Hysteresis"])  
             self.rate_smoothing = tk.DoubleVar(value=username_data["VVI"]["Rate Smoothing"])
             variables = [
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
-                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Amplitude", 0.5, 10, self.ventricular_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
-                ("Ventrical Sensitivity", 0, 5.0, self.ventrical_sensitivity, 0.5),
+                ("Ventrical Sensitivity", 1, 10, self.ventricular_sensitivity, 1),
                 ("VRP", 100, 500, self.vrp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
@@ -459,9 +462,9 @@ class MainPage:
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
-                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Amplitude", 0.5, 10, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 60, 120, self.activity_threshold, 10),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -471,8 +474,8 @@ class MainPage:
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Lower Rate Limit"])
             self.upper_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Upper Rate Limit"])
             self.max_sensor_rate = tk.DoubleVar(value=username_data["VOOR"]["Max Sensor Rate"])
-            self.atrial_amplitude = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Amplitude"])
-            self.atrial_pulse_width = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Pulse Width"])
+            self.ventricular_amplitude = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Amplitude"])
+            self.ventricular_pulse_width = tk.DoubleVar(value=username_data["VOOR"]["Ventricular Pulse Width"])
             self.activity_threshold = tk.DoubleVar(value=username_data["VOOR"]["Activity Threshold"])
             self.reaction_time = tk.DoubleVar(value=username_data["VOOR"]["Reaction Time"])
             self.response_factor = tk.DoubleVar(value=username_data["VOOR"]["Response Factor"])
@@ -481,9 +484,9 @@ class MainPage:
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
-                ("Ventricular Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
-                ("Ventricular Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Ventricular Amplitude", 0.5, 10, self.ventricular_amplitude, 0.5),
+                ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
+                ("Activity Threshold", 60, 120, self.activity_threshold, 10),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -508,14 +511,14 @@ class MainPage:
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
-                ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
+                ("Atrial Amplitude", 0.5, 10, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Atrial Sensitivity", 0, 5.0, self.atrial_sensitivity, 0.5),
+                ("Atrial Sensitivity", 1, 10, self.atrial_sensitivity, 1),
                 ("ARP", 100, 500, self.arp, 10),
                 ("PVARP", 150, 500, self.pvarp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 60, 120, self.activity_threshold, 10),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -539,13 +542,13 @@ class MainPage:
                 ("Lower Rate Limit (LRL)", 30, 180, self.lower_rate_limit, 5),
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
-                ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
+                ("Ventricular Amplitude", 0.5, 10, self.ventricular_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
-                ("Ventricular Sensitivity", 0, 5.0, self.ventricular_sensitivity, 0.5),
+                ("Ventricular Sensitivity", 1, 10, self.ventricular_sensitivity, 1),
                 ("VRP", 100, 500, self.vrp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 60, 120, self.activity_threshold, 10),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -604,6 +607,7 @@ class MainPage:
                 username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
                 username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                print(int(self.atrial_pulse_width.get()))
                 self.send_packet(1, 0, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "VOO":
@@ -611,7 +615,7 @@ class MainPage:
                 username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["VOO"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
                 username_data["VOO"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-                self.send_packet(1, 0, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+                self.send_packet(1, 0, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "AAI":
                 username_data["AAI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -629,10 +633,10 @@ class MainPage:
                 username_data["VVI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["VVI"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
                 username_data["VVI"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-                username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
+                username_data["VVI"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
                 username_data["VVI"]["VRP"] = self.vrp.get()
                 username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
-                self.send_packet(1, 0, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+                self.send_packet(1, 0, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "AOOR":
                 username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -657,7 +661,7 @@ class MainPage:
                 username_data["VOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
 
-                self.send_packet(1, 0, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+                self.send_packet(1, 0, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             elif self.initial_state.get() == "AAIR":
                 username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -675,7 +679,7 @@ class MainPage:
                 username_data["AAIR"]["Response Factor"] = self.response_factor.get()
                 username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
 
-                self.send_packet(1, 0, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+                self.send_packet(1, 0, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             elif self.initial_state.get() == "VVIR":
                 username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -683,7 +687,7 @@ class MainPage:
                 username_data["VVIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
                 username_data["VVIR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
                 username_data["VVIR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-                username_data["VVIR"]["Ventricular Sensitivity"] = self.vrp.get()
+                username_data["VVIR"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
                 username_data["VVIR"]["VRP"] = self.vrp.get()
                 username_data["VVIR"]["Hysteresis"] = self.hysteresis.get()
                 username_data["VVIR"]["Rate Smoothing"] = self.rate_smoothing.get()
@@ -691,7 +695,7 @@ class MainPage:
                 username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["VVIR"]["Response Factor"] = self.response_factor.get()
                 username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
-                self.send_packet(1, 0, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+                self.send_packet(1, 0, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
             self.user_manager.update_user_data(self.username, username_data)
