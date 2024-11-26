@@ -321,8 +321,8 @@ class MainPage:
         # recieve the data
         raw_data = self.ser.read(32)  # Read exactly 32 bytes
         if len(raw_data) == 32:
-            #unopacking the data
-            unpacked = self.unpack_data(raw_data)
+            #unpacking the data
+            
             format_string = '16Bdd'  # 16 unsigned bytes (B) and 2 double-precision floats (d)
             unpacked_data = struct.unpack(format_string, raw_data)
 
