@@ -277,6 +277,12 @@ class MainPage:
             self.reset_plot() # Reset the plot when electrogram is shown
         elif value == "Edit Parameters":
             self.show_edit_frame() # Call the function to show the parameter editing frame
+    def send_packet(self, sync, command, mode, apw, vpw, a_amp, v_amp, a_sens, v_sens, arp, vrp, url, lrl, res_factor, rxn_time, rec_time, thresh):
+        packet = struct.pack(  # Format the packet
+            'BBBBBBBBBBBBBBBBB',
+            sync, command, mode, apw, vpw, a_amp, v_amp, a_sens, v_sens, arp, vrp, url, lrl, res_factor, rxn_time, rec_time, thresh
+        )
+        self.ser.write(packet)  # Send the packet over serial
 
     def show_electrogram(self):
         # Hide edit frame and show electrogram frame
@@ -289,27 +295,28 @@ class MainPage:
     def update_plot(self):
         #send the data
         if self.initial_state.get() == "AOO":
-            self.send_packet(1, 0, 1, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(),0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+            self.send_packet(1, 0, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "VOO":
-            self.send_packet(1, 0, 2, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+            self.send_packet(1, 0, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+
         elif self.initial_state.get() == "AAI":
-            self.send_packet(1, 0, 3, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(),0, self.atrial_sensitivity.get(), 0, self.arp.get(), 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+            self.send_packet(1, 0, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "VVI":
-            self.send_packet(1, 0, 4, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, self.ventrical_sensitivity.get(), 0, self.vrp.get(), 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+            self.send_packet(1, 0, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
         elif self.initial_state.get() == "AOOR":
-            self.send_packet(1, 0, 5, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(),0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+            self.send_packet(1, 0, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         elif self.initial_state.get() == "VOOR":
-            self.send_packet(1, 0, 6, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+            self.send_packet(1, 0, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         elif self.initial_state.get() == "AAIR":
-            self.send_packet(1, 0, 7, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(), self.atrial_amplitude.get(), 0, self.atrial_sensitivity.get(), 0, self.arp.get(), 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+            self.send_packet(1, 0, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         elif self.initial_state.get() == "VVIR":
-            self.send_packet(1, 0, 8, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, self.ventrical_sensitivity.get(), 0, self.vrp.get(), 0,  self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+            self.send_packet(1, 0, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         # recieve the data
         raw_data = self.ser.read(32)  # Read exactly 32 bytes
@@ -586,30 +593,26 @@ class MainPage:
         self.checkbox2 = ctk.CTkCheckBox(self.popup_frame, text="No", variable=self.checkbox2_var, command=self.update_user_data)
         self.checkbox2.pack(side="right", pady=10, padx=10)
 
-    def send_packet(self, sync, command, mode, apw, vpw, a_amp, v_amp, a_sens, v_sens, arp, vrp, url, lrl, res_factor, rxn_time, rec_time, thresh):
-        packet = struct.pack(  # Format the packet
-            'BBBBBBBBBBBBBBBBB',
-            sync, command, mode, apw, vpw, a_amp, v_amp, a_sens, v_sens, arp, vrp, url, lrl, res_factor, rxn_time, rec_time, thresh
-        )
-        self.ser.write(packet)  # Send the packet over serial
 
     def update_user_data(self):
         if self.checkbox1_var.get() and not self.checkbox2_var.get():
             self.popup_frame.destroy()
             username_data = self.user_manager.read_user(self.username)
+    
             if self.initial_state.get() == "AOO":
                 username_data["AOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
                 username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-                self.send_packet(1, 0, 1, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(),0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+                self.send_packet(1, 0, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "VOO":
                 username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["VOO"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
                 username_data["VOO"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-                self.send_packet(1, 0, 2, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+                self.send_packet(1, 0, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
+
             elif self.initial_state.get() == "AAI":
                 username_data["AAI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["AAI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -619,7 +622,7 @@ class MainPage:
                 username_data["AAI"]["ARP"] = self.arp.get()
                 username_data["AAI"]["Hysteresis"] = self.hysteresis.get()
                 username_data["AAI"]["Rate Smoothing"] = self.rate_smoothing.get()
-                self.send_packet(1, 0, 3, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(),0, self.atrial_sensitivity.get(), 0, self.arp.get(), 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+                self.send_packet(1, 0, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "VVI":
                 username_data["VVI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -629,7 +632,7 @@ class MainPage:
                 username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
                 username_data["VVI"]["VRP"] = self.vrp.get()
                 username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
-                self.send_packet(1, 0, 4, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, self.ventrical_sensitivity.get(), 0, self.vrp.get(), 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), 0, 0, 0, 0)
+                self.send_packet(1, 0, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "AOOR":
                 username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -641,7 +644,7 @@ class MainPage:
                 username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["AOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
-                self.send_packet(1, 0, 5, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(),0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+                self.send_packet(1, 0, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             elif self.initial_state.get() == "VOOR":
                 username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -654,7 +657,7 @@ class MainPage:
                 username_data["VOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
 
-                self.send_packet(1, 0, 6, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, 0, 0, 0, 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+                self.send_packet(1, 0, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             elif self.initial_state.get() == "AAIR":
                 username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -672,7 +675,7 @@ class MainPage:
                 username_data["AAIR"]["Response Factor"] = self.response_factor.get()
                 username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
 
-                self.send_packet(1, 0, 7, self.atrial_pulse_width.get(), 0, self.atrial_amplitude.get(), self.atrial_amplitude.get(), 0, self.atrial_sensitivity.get(), 0, self.arp.get(), 0, self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+                self.send_packet(1, 0, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             elif self.initial_state.get() == "VVIR":
                 username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
@@ -680,7 +683,7 @@ class MainPage:
                 username_data["VVIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
                 username_data["VVIR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
                 username_data["VVIR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-                username_data["VVIR"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
+                username_data["VVIR"]["Ventricular Sensitivity"] = self.vrp.get()
                 username_data["VVIR"]["VRP"] = self.vrp.get()
                 username_data["VVIR"]["Hysteresis"] = self.hysteresis.get()
                 username_data["VVIR"]["Rate Smoothing"] = self.rate_smoothing.get()
@@ -688,7 +691,7 @@ class MainPage:
                 username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["VVIR"]["Response Factor"] = self.response_factor.get()
                 username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
-                self.send_packet(1, 0, 8, 0, self.ventricular_pulse_width.get(), 0, self.ventricular_amplitude.get(), 0, self.ventrical_sensitivity.get(), 0, self.vrp.get(), 0,  self.upper_rate_limit.get(), self.lower_rate_limit.get(), self.response_factor.get(), self.reaction_time.get(), self.recovery_time.get(), self.activity_threshold.get())
+                self.send_packet(1, 0, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventrical_sensitivity.get()), 0, int(self.vrp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
             username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
             self.user_manager.update_user_data(self.username, username_data)
