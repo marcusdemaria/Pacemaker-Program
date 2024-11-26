@@ -1,11 +1,11 @@
 {
     "username": "marcus",
-    "password": "gAAAAABnQjjKHPofk93zYZ6UuST091zyQ9jJ5M5kOTOZb0EaKt8m-kmCJdB3J09VGLpIDWGLxFzv5ON9PyphaMe_fTM9Be3Kwg==",
+    "password": "gAAAAABnQkoJp7kccPCl9bvQd75zYatZeiNbh9f7ObD8y12dYRwWr3bla1VivSfiwthhsCBNSAEJbULrvn4X8WZ4pV3Z7F7jDw==",
     "AOO": {
-        "Lower Rate Limit": 60,
-        "Upper Rate Limit": 120,
+        "Lower Rate Limit": 60.0,
+        "Upper Rate Limit": 120.0,
         "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 1
+        "Atrial Pulse Width": 27.0
     },
     "VOO": {
         "Lower Rate Limit": 60,
