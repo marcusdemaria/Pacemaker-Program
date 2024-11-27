@@ -117,8 +117,6 @@ class LoginPage:
         self.create_top_widgets()  #Call the function to create the interface elements
         self.create_widgets()  #Call the function to create the interface elements
 
-    
-
     def create_top_widgets(self):
         # Create a frame to contain the top bar
         container_frame = ctk.CTkFrame(self.master, height=25, fg_color="#000000")
@@ -172,8 +170,6 @@ class LoginPage:
 
         # Start updating the time
         self.update_time()
-
-
 
     def update_time(self):
         if self.date_time_label.winfo_exists():
@@ -274,7 +270,6 @@ class LoginPage:
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
 
-
     def open_create_user_page(self):
         self.app.open_create_user_page() # Open the page to create a new user
 
@@ -340,14 +335,11 @@ class CreateUserPage:
         # Start updating the time
         self.update_time()
 
-
-
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
             self.date_time_label.configure(text=f"{formatted_datetime}")
             self.master.after(1000, self.update_time)  # Schedule the next update
-
 
     def create_widgets(self):
         # Create a frame that will fill the window screen
@@ -362,7 +354,6 @@ class CreateUserPage:
         container_frame.rowconfigure(3, weight=1)  # For error label
         container_frame.rowconfigure(4, weight=1)  # For buttons
         
-
         # Center Frame to contain the create user form
         center_frame = ctk.CTkFrame(container_frame)
         center_frame.grid(row=1, column=0, padx=5, pady=5, sticky="nsew") # Positioned at the center
@@ -449,8 +440,7 @@ class MainPage:
         self.username = username # Store the username for the current user
         
         self.user_manager = user_manager  # Ensure user_manager is passed to the main page
-        
-        
+          
         #initial graphing data
         self.y_values = deque([0] * 30, maxlen=30)  # Y-axis values for the plot
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
@@ -523,15 +513,12 @@ class MainPage:
         # Start updating the time
         self.update_time()
 
-
-
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
             self.date_time_label.configure(text=f"{formatted_datetime}")
             self.master.after(1000, self.update_time)  # Schedule the next update
 
-   
     def create_widgets(self):
 
         container_frame = ctk.CTkFrame(self.master, fg_color="transparent")
@@ -556,7 +543,6 @@ class MainPage:
         self.edit_frame = ctk.CTkScrollableFrame(container_frame)
         self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
         
-         
         #Setting up the rest of the area
 
         select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16, "bold")) # Create a label for selecting pacemaker modes.
@@ -590,12 +576,10 @@ class MainPage:
         delete_user_button.grid(row=8, column=0, sticky="nesw", pady=(1,10), padx=(10, 1))
         self.delete_user_button = delete_user_button # Store the reference to the button in self.delete_user_button for later use
         self.delete_user_button.configure(state="disabled")
-        
-
+    
         # Initialize by hiding the electrogram frame
         self.electrogram_frame.grid_forget()
         self.show_edit_frame() 
-
 
     def toggle_admin_mode(self):
         if not self.admin_mode.get():  # Admin Mode is OFF, prompt for a password
@@ -651,10 +635,7 @@ class MainPage:
             self.popup_frame.destroy()
             self.incorrect_password = ctk.CTkLabel(self.master, text="Incorrect Password", font=("Arial", 16, "bold"), text_color="red")
             self.incorrect_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
-            self.master.after(3000, lambda: self.incorrect_password.destroy())
-            
-        
-        
+            self.master.after(3000, lambda: self.incorrect_password.destroy())        
 
         # Update the frame with the new admin state
         self.update_edit_frame(self.initial_state.get())
@@ -778,7 +759,6 @@ class MainPage:
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1)
             ]
             
-
         elif mode == "VOO":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VOO"]["Lower Rate Limit"])
@@ -792,7 +772,6 @@ class MainPage:
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
             ]
             
-
         elif mode == "AAI":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AAI"]["Lower Rate Limit"])
@@ -835,6 +814,7 @@ class MainPage:
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
             ]
+
         elif mode == "AOOR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Lower Rate Limit"])
@@ -857,6 +837,7 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
+
         elif mode == "VOOR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Lower Rate Limit"])
@@ -879,6 +860,7 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
+
         elif mode == "AAIR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Lower Rate Limit"])
@@ -911,6 +893,7 @@ class MainPage:
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
+
         elif mode == "VVIR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VVIR"]["Lower Rate Limit"])
@@ -1066,6 +1049,7 @@ class MainPage:
                 username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["AOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
+
             elif self.initial_state.get() == "VOOR":
                 username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["VOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -1076,6 +1060,7 @@ class MainPage:
                 username_data["VOOR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["VOOR"]["Response Factor"] = self.response_factor.get()
                 username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
+
             elif self.initial_state.get() == "AAIR":
                 username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["AAIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
@@ -1091,6 +1076,7 @@ class MainPage:
                 username_data["AAIR"]["Reaction Time"] = self.reaction_time.get()
                 username_data["AAIR"]["Response Factor"] = self.response_factor.get()
                 username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
+                
             elif self.initial_state.get() == "VVIR":
                 username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["VVIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
