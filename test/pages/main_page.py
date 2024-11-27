@@ -4,11 +4,11 @@ import tkinter as tk  # Import the standard Tkinter library for creating GUI app
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 from collections import deque
-import random
 from PIL import Image, ImageTk  # Import the Image and ImageTk classes from the Pillow library for image processing and display
 from datetime import datetime  # Import the datetime class to handle date and time operations
 import serial
 import struct
+import os
 
 class MainPage:
     def __init__(self, master, app, username, user_manager): # Initialize the main page
@@ -17,7 +17,7 @@ class MainPage:
         self.username = username # Store the username for the current user
         
         self.user_manager = user_manager  # Ensure user_manager is passed to the main page
-        
+        self.plot_running = False
         # Set up the serial connection
         self.ser = serial.Serial(port='COM4', baudrate=115200, timeout=1)
         
@@ -287,39 +287,42 @@ class MainPage:
     def show_electrogram(self):
         # Hide edit frame and show electrogram frame
         self.edit_frame.grid_forget() # Remove the edit frame from the grid layout (not destroyed, just hidden)
-
+        
         # Display electrogram frame with the plot
         self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
-        self.update_plot() # Call the function to update the plot with new values or refreshed data
+        self.plot_running = True
+        self.update_plot(self.initial_state.get()) # Call the function to update the plot with new values or refreshed data
 
-    def update_plot(self):
+    def update_plot(self, mode):
+        if not self.plot_running:
+            return
         #send the data
-        if self.initial_state.get() == "AOO":
+        if mode == "AOO":
             self.send_packet(1, 1, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
-
-        elif self.initial_state.get() == "VOO":
+            print(self.atrial_pulse_width.get())
+        elif mode == "VOO":
                 
             self.send_packet(1, 1, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
-        elif self.initial_state.get() == "AAI":
+        elif mode == "AAI":
                 
             self.send_packet(1, 1, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
-        elif self.initial_state.get() == "VVI":
+        elif mode == "VVI":
                 
             self.send_packet(1, 1, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
-        elif self.initial_state.get() == "AOOR":
+        elif mode == "AOOR":
                 
             self.send_packet(1, 1, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
-        elif self.initial_state.get() == "VOOR":
+        elif mode == "VOOR":
             self.send_packet(1, 1, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
-        elif self.initial_state.get() == "AAIR":
+        elif mode == "AAIR":
             self.send_packet(1, 1, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
-        elif self.initial_state.get() == "VVIR":
+        elif mode == "VVIR":
             self.send_packet(1, 1, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
 
         # recieve the data
@@ -352,12 +355,13 @@ class MainPage:
         self.canvas.draw()
 
         # Schedule the next update after 200 ms
-        self.master.after(200, self.update_plot)
+        if self.plot_running:
+            self.master.after(200, lambda: self.update_plot(mode))
     
     def show_edit_frame(self):
         # Hide the electrogram frame to make the edit frame visible
         self.electrogram_frame.grid_forget()
-
+        self.plot_running = False
         # Display the edit frame in the specified grid position with padding
         self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
 
@@ -421,7 +425,7 @@ class MainPage:
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
                 ("Atrial Amplitude", 0.5, 10, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Atrial Sensitivity", 1, 10, self.atrial_sensitivity, 1),
+                ("Atrial Sensitivity", 6, 10, self.atrial_sensitivity, 1),
                 ("ARP", 100, 500, self.arp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
@@ -442,7 +446,7 @@ class MainPage:
                 ("Upper Rate Limit (URL)", 50, 180, self.upper_rate_limit, 5),
                 ("Ventricular Amplitude", 0.5, 10, self.ventricular_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
-                ("Ventrical Sensitivity", 1, 10, self.ventricular_sensitivity, 1),
+                ("Ventrical Sensitivity", 6, 10, self.ventricular_sensitivity, 1),
                 ("VRP", 100, 500, self.vrp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
@@ -513,7 +517,7 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Atrial Amplitude", 0.5, 10, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Atrial Sensitivity", 1, 10, self.atrial_sensitivity, 1),
+                ("Atrial Sensitivity", 6, 10, self.atrial_sensitivity, 1),
                 ("ARP", 100, 500, self.arp, 10),
                 ("PVARP", 150, 500, self.pvarp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
@@ -544,7 +548,7 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Ventricular Amplitude", 0.5, 10, self.ventricular_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
-                ("Ventricular Sensitivity", 1, 10, self.ventricular_sensitivity, 1),
+                ("Ventricular Sensitivity", 6, 10, self.ventricular_sensitivity, 1),
                 ("VRP", 100, 500, self.vrp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
