@@ -1,11 +1,11 @@
 {
-    "username": "aidan",
-    "password": "gAAAAABnQkDx6NP2y5G37IpZBZKri-zJ7sh1he-cJW5SvGZHylolD--yFQzrdetqySJUnNsdSfXRKxXeFjjL46grC1wVmcEKvg==",
+    "username": "test",
+    "password": "gAAAAABnRmJM_DcIvZUzixa-5ds02AmpUr9M8e-yDbzgp6XBi8S-MlnjtD6tSzEqE9H55c8Ho7EMhoOm-TQW2lwFlqYnfBx6Lg==",
     "AOO": {
-        "Lower Rate Limit": 60.0,
-        "Upper Rate Limit": 120.0,
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
         "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 8.0
+        "Atrial Pulse Width": 1
     },
     "VOO": {
         "Lower Rate Limit": 60,
@@ -34,15 +34,15 @@
         "Rate Smoothing": 12
     },
     "AOOR": {
-        "Lower Rate Limit": 60,
-        "Upper Rate Limit": 120,
-        "Max Sensor Rate": 175,
+        "Lower Rate Limit": 60.0,
+        "Upper Rate Limit": 120.0,
+        "Max Sensor Rate": 175.0,
         "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 1,
-        "Activity Threshold": 2.5,
-        "Reaction Time": 10,
-        "Response Factor": 8,
-        "Recovery Time": 2
+        "Atrial Pulse Width": 1.0,
+        "Activity Threshold": 5.0,
+        "Reaction Time": 10.0,
+        "Response Factor": 8.0,
+        "Recovery Time": 2.0
     },
     "VOOR": {
         "Lower Rate Limit": 60,
@@ -50,7 +50,7 @@
         "Max Sensor Rate": 175,
         "Ventricular Amplitude": 3.5,
         "Ventricular Pulse Width": 1,
-        "Activity Threshold": 2.5,
+        "Activity Threshold": 4.0,
         "Reaction Time": 10,
         "Response Factor": 8,
         "Recovery Time": 2
@@ -66,7 +66,7 @@
         "PVARP": 250,
         "Hysteresis": 3.0,
         "Rate Smoothing": 12,
-        "Activity Threshold": 2.5,
+        "Activity Threshold": 4.0,
         "Reaction Time": 10,
         "Response Factor": 8,
         "Recovery Time": 2
@@ -81,7 +81,7 @@
         "VRP": 250,
         "Hysteresis": 3.0,
         "Rate Smoothing": 12,
-        "Activity Threshold": 2.5,
+        "Activity Threshold": 4.0,
         "Reaction Time": 10,
         "Response Factor": 8,
         "Recovery Time": 2

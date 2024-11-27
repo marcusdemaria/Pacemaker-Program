@@ -1,6 +1,3 @@
-from multiprocessing import connection  # Import the connection module from the multiprocessing library for handling inter-process communication
-from pdb import run  # Import the run function from the pdb (Python Debugger) module to facilitate debugging
-from tracemalloc import stop  # Import the stop function from tracemalloc to stop memory tracking
 import customtkinter as ctk  # Import the CustomTkinter library, which provides custom themed widgets for Tkinter, as 'ctk'
 import tkinter as tk  # Import the standard Tkinter library for creating GUI applications, as 'tk'
 import os  # Import the os module for interacting with the operating system (file and directory management)
@@ -10,8 +7,6 @@ from PIL import Image, ImageTk  # Import the Image and ImageTk classes from the 
 from matplotlib.figure import Figure  # Import the Figure class from matplotlib for creating figures for plotting
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Import the FigureCanvasTkAgg class to integrate Matplotlib figures into Tkinter
 from datetime import datetime  # Import the datetime class to handle date and time operations
-import time  # Import the time module for time-related functions (e.g., sleep)
-import serial.tools.list_ports  # Import the list_ports module from serial.tools to list available serial ports
 from cryptography.fernet import Fernet  # Import the Fernet class from the cryptography library for secure encryption and decryption, particularly for handling passwords
 import json
 import re  # For sanitizing filenames
@@ -80,10 +75,10 @@ class UserManager:
             "VOO": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1},
             "AAI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12},
             "VVI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12},
-            "AOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
-            "VOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
-            "AAIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "PVARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
-            "VVIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "AOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "VOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "AAIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "PVARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "VVIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
             # You can add more user-specific data here
         }
 
@@ -120,7 +115,9 @@ class LoginPage:
         self.app = app  # Store the app reference to the main application
         self.success_message = success_message  # Whether to show a success message
         self.create_top_widgets()  #Call the function to create the interface elements
-        self.create_widgets()  #Call the function to create the interface elements   
+        self.create_widgets()  #Call the function to create the interface elements
+
+    
 
     def create_top_widgets(self):
         # Create a frame to contain the top bar
@@ -176,6 +173,8 @@ class LoginPage:
         # Start updating the time
         self.update_time()
 
+
+
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
@@ -205,19 +204,19 @@ class LoginPage:
 
         # Username label
         username_label = ctk.CTkLabel(center_frame, text="Username:", font=("Arial", 18))
-        username_label.pack(pady=(5, 2))
+        username_label.pack(pady=(5, 2),padx=178, anchor='w')
 
         # Entry box for the username (adjusted height and width)
         self.username_entry = ctk.CTkEntry(center_frame, height=40, width=300, font=("Arial", 18))
-        self.username_entry.pack(pady=10)
+        self.username_entry.pack(pady=(2,5))
 
         # Password label
         password_label = ctk.CTkLabel(center_frame, text="Password:", font=("Arial", 18))
-        password_label.pack(pady=(5, 2))
+        password_label.pack(pady=(5, 2), padx=178, anchor='w')
 
         # Entry box for the password (shows '*' instead of actual characters)
         self.password_entry = ctk.CTkEntry(center_frame, show="*", height=40, width=300, font=("Arial", 18))
-        self.password_entry.pack(pady=10)
+        self.password_entry.pack(pady=(2,5))
 
         # Label to show error messages if login fails (initially empty)
         self.login_error_label = ctk.CTkLabel(center_frame, text="", fg_color="transparent", font=("Arial", 16))
@@ -274,6 +273,7 @@ class LoginPage:
             # Clear input fields
             self.username_entry.delete(0, tk.END)
             self.password_entry.delete(0, tk.END)
+
 
     def open_create_user_page(self):
         self.app.open_create_user_page() # Open the page to create a new user
@@ -340,11 +340,14 @@ class CreateUserPage:
         # Start updating the time
         self.update_time()
 
+
+
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
             self.date_time_label.configure(text=f"{formatted_datetime}")
             self.master.after(1000, self.update_time)  # Schedule the next update
+
 
     def create_widgets(self):
         # Create a frame that will fill the window screen
@@ -413,7 +416,7 @@ class CreateUserPage:
             dynamic_users_label = ctk.CTkLabel(user_frame, text=f"{total_users}/10", font=("Arial", 16))
             dynamic_users_label.pack(side="left")
 
-    # This might cause an issue with the sizing if the length of the error message is larger than the entry box
+    # this might cause an issue with the sizing if the length of the error message is larger than the entry box
     def handle_create_user(self):
         new_username = self.new_username_entry.get()
         new_password = self.new_password_entry.get()
@@ -453,7 +456,7 @@ class MainPage:
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
 
         # Create a figure and axis for the plot
-        self.fig = Figure(figsize=(3, 3), dpi=100)  # Adjust size for better visibility
+        self.fig = Figure(figsize=(3, 5), dpi=100)  # Adjust size for better visibility
         self.ax = self.fig.add_subplot(111)
 
         # Label the graph
@@ -520,89 +523,166 @@ class MainPage:
         # Start updating the time
         self.update_time()
 
+
+
     def update_time(self):
         if self.date_time_label.winfo_exists():
             formatted_datetime = datetime.now().strftime("%Y-%m-%d - %H:%M:%S")
             self.date_time_label.configure(text=f"{formatted_datetime}")
             self.master.after(1000, self.update_time)  # Schedule the next update
 
+   
     def create_widgets(self):
 
         container_frame = ctk.CTkFrame(self.master, fg_color="transparent")
         container_frame.pack(fill="both", expand=True)
         # Setting up the Grid Layout
         container_frame.columnconfigure((0, 1), weight=1)
-        container_frame.columnconfigure((2, 3), weight=2)
+        container_frame.columnconfigure((2, 3), weight=4)
         container_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
 
         #setting up graph area
         # Create a canvas widget to display the matplotlib figure within the tkinter frame.
-        self.electrogram_frame = ctk.CTkFrame(container_frame)
-        self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.electrogram_frame = ctk.CTkScrollableFrame(container_frame)
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         # Create the canvas for the plot
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
         
         # Attach the canvas to the tkinter grid, center it within the frame with padding.
-        self.canvas.get_tk_widget().grid(row=0, column=0, sticky='nsew', padx=20, pady=20)
+        self.canvas.get_tk_widget().pack(fill="both", expand=True)
 
         # Frame for editing parameters
         self.edit_frame = ctk.CTkScrollableFrame(container_frame)
-        self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
         
          
         #Setting up the rest of the area
 
-        select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16)) # Create a label for selecting pacemaker modes.
-        select_mode_label.grid(row=1, column=0, columnspan=2, pady=2) # Place the mode label in the grid.
+        select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16, "bold")) # Create a label for selecting pacemaker modes.
+        select_mode_label.grid(row=0, column=0, pady=1, padx=10, sticky="sw") # Place the mode label in the grid.
 
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI", "AOOR", "VOOR", "AAIR", "VVIR"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
         self.initial_state = tk.StringVar(value="AOO")  # Initialize the pacemaker mode variable with a default value of "AOO".
         pacemaker_state_optionmenu = ctk.CTkOptionMenu(container_frame, values=pacemaker_state_options, variable=self.initial_state, command=self.update_edit_frame) # Create an option menu for selecting the pacemaker mode.
-        pacemaker_state_optionmenu.grid(row=2, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the option menu in the grid.
+        pacemaker_state_optionmenu.grid(row=1, column=0, sticky="new", pady=1, padx=(10, 1)) # Place the option menu in the grid.
 
         # Segmented Button for Show Electrogram and Edit Parameters
-        self.segmented_button = ctk.CTkSegmentedButton(container_frame, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback)
-        self.segmented_button.grid(row=3, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))  # Place the segmented button in the grid
+        self.segmented_button = ctk.CTkSegmentedButton(container_frame, values=["Edit Parameters", "Show Electrogram"], command=self.segment_button_callback, font=("Arial", 16, "bold")) # Create a segmented button with two options
+        self.segmented_button.grid(row=2, column=0, sticky="nesw", pady=1, padx=(10, 1))  # Place the segmented button in the grid
         self.segmented_button.set("Edit Parameters") # Set the default selection to "Edit Parameters"
 
-        edit_data_button = ctk.CTkButton(container_frame, text="Update Data", command=self.update_user_data) # Create a button to export data
-        edit_data_button.grid(row=4, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        send_data_button = ctk.CTkButton(container_frame, text="Send to Pacemaker") # Create a button to send data to the pacemaker
-        send_data_button.grid(row=5, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        logout_button = ctk.CTkButton(container_frame, text="Logout", command=self.app.open_login_page) # Create a button to log out
-        logout_button.grid(row=6, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        delete_user_button = ctk.CTkButton(container_frame, text="Delete User", command=self.delete_current_user) # Create a button to delete the current user
-        delete_user_button.grid(row=7, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
-        exit_button = ctk.CTkButton(container_frame, text="Exit", command=container_frame.destroy, fg_color="red", hover_color="#bd1809") # Create an exit button to close the app
-        exit_button.grid(row=9, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1))
-
+        edit_data_button = ctk.CTkButton(container_frame, text="Save Data", command=self.update_user_data_check, font=("Arial", 22, "bold")) # Create a button to export data
+        edit_data_button.grid(row=3, column=0, sticky="nesw", pady=1, padx=(10, 1))
+        self.edit_data_button = edit_data_button # Store the reference to the button in self.edit_data_button for later use
+        self.edit_data_button.configure(state="disabled") # Disable the edit data button
+            
         # Admin Mode Toggle Button
         self.admin_mode = tk.BooleanVar(value=False) # Initialize a Boolean variable to track the state of admin mode (OFF by default)
-        admin_mode_button = ctk.CTkButton(container_frame, text="Admin Mode: OFF", command=self.toggle_admin_mode) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
-        admin_mode_button.grid(row=8, column=0, columnspan=2, sticky="new", pady=10, padx=(10, 1)) # Place the button in the grid layout at row 8, column 0, spanning 2 columns with padding
+        admin_mode_button = ctk.CTkButton(container_frame, text="Admin Mode: OFF", command=self.toggle_admin_mode, font=("Arial", 22, "bold")) # Create a button labeled "Admin Mode: OFF" that calls toggle_admin_mode when clicked
+        admin_mode_button.grid(row=4, column=0, sticky="nesw", pady=1, padx=(10, 1)) # Place the button in the grid layout at row 8, column 0, spanning 2 columns with padding
         self.admin_mode_button = admin_mode_button # Store the reference to the button in self.admin_mode_button for later use
+
+        logout_button = ctk.CTkButton(container_frame, text="Logout", command=self.app.open_login_page, font=("Arial", 22, "bold")) # Create a button to log out
+        logout_button.grid(row=7, column=0, sticky="nesw", pady=1, padx=(10, 1))
+
+        delete_user_button = ctk.CTkButton(container_frame, text="Delete User", command=self.delete_current_user_check, font=("Arial", 22, "bold")) # Create a button to delete the current user
+        delete_user_button.grid(row=8, column=0, sticky="nesw", pady=(1,10), padx=(10, 1))
+        self.delete_user_button = delete_user_button # Store the reference to the button in self.delete_user_button for later use
+        self.delete_user_button.configure(state="disabled")
+        
 
         # Initialize by hiding the electrogram frame
         self.electrogram_frame.grid_forget()
-        self.show_edit_frame()        
+        self.show_edit_frame() 
+
 
     def toggle_admin_mode(self):
-        self.admin_mode.set(not self.admin_mode.get()) # Change the admin_mode variable to its opposite value (toggle it)
-        if self.admin_mode.get(): # Update the button text based on the new state of admin mode
-            self.admin_mode_button.configure(text="Admin Mode: ON") # Change text of button to ON
-        else:  # If admin mode is OFF
-            self.admin_mode_button.configure(text="Admin Mode: OFF") # Change text of button to OFF
+        if not self.admin_mode.get():  # Admin Mode is OFF, prompt for a password
+            # Create a popup frame and store it as an instance attribute
+            self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+            self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            
+            # Create the label, entry, and submit button inside the popup frame
+            self.admin_label = ctk.CTkLabel(self.popup_frame, text="Enter Admin Password:", font=("Arial", 16, "bold"))  
+            self.admin_label.pack(pady=10, padx=15)  # Add padding to the label
+            
+            self.admin_password_entry = ctk.CTkEntry(self.popup_frame, show="*", font=("Arial", 16))  
+            self.admin_password_entry.pack(pady=10)  # Add padding to the entry field
+            
+            self.submit_button = ctk.CTkButton(
+                self.popup_frame, 
+                text="Submit", 
+                command=self.check_admin_password, 
+                font=("Arial", 16, "bold")
+            )  
+            self.submit_button.pack(pady=10)  # Add padding to the submit button
+        else:
+            # Incorrect password: disable admin mode and show an error message
+            self.admin_mode.set(False)
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+            self.edit_data_button.configure(state="disabled")
+            self.delete_user_button.configure(state="disabled")
+            self.update_edit_frame(self.initial_state.get())
+
+    def check_admin_password(self):
+        # Get the entered password
+        entered_password = self.admin_password_entry.get()  
+        
+        # Validate the entered password
+        if entered_password == "1234":  # Replace with a secure password
+            # Correct password: enable admin mode
+            self.admin_mode.set(True)
+            self.admin_mode_button.configure(text="Admin Mode: ON")
+            self.edit_data_button.configure(state="normal")
+            self.delete_user_button.configure(state="normal")
+            # Destroy the popup frame and its contents
+            self.popup_frame.destroy()
+            self.correct_password = ctk.CTkLabel(self.master, text="Correct Password", font=("Arial", 16, "bold"), text_color="green")
+            self.correct_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            self.master.after(3000, lambda: self.correct_password.destroy())
+        else:
+            # Incorrect password: disable admin mode and show an error message
+            self.admin_mode.set(False)
+            self.admin_mode_button.configure(text="Admin Mode: OFF")
+            self.edit_data_button.configure(state="disabled")
+            self.delete_user_button.configure(state="disabled")
+            # Destroy the popup frame and its contents
+            self.popup_frame.destroy()
+            self.incorrect_password = ctk.CTkLabel(self.master, text="Incorrect Password", font=("Arial", 16, "bold"), text_color="red")
+            self.incorrect_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+            self.master.after(3000, lambda: self.incorrect_password.destroy())
+            
+        
+        
+
+        # Update the frame with the new admin state
         self.update_edit_frame(self.initial_state.get())
+    
+    def delete_current_user_check(self):
+         # Create a popup frame and store it as an instance attribute
+        self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+        # Create BooleanVar for checkboxes
+        self.checkbox1_var = ctk.BooleanVar()
+        self.checkbox2_var = ctk.BooleanVar()
+        self.check = ctk.CTkLabel(self.popup_frame, text="Are you sure you want to delete this account?", font=("Arial", 16, "bold"))
+        self.check.pack(pady=10, padx=10)
+        # Create checkboxes
+        self.checkbox1 = ctk.CTkCheckBox(self.popup_frame, text="Yes", variable=self.checkbox1_var, command=self.delete_current_user)
+        self.checkbox1.pack(side="left", pady=10, padx=(50, 10))
+
+        self.checkbox2 = ctk.CTkCheckBox(self.popup_frame, text="No", variable=self.checkbox2_var, command=self.delete_current_user)
+        self.checkbox2.pack(side="right", pady=10, padx=10)
 
     def delete_current_user(self):
-        current_user = self.username  # Get the username of the current user
-        self.user_manager.delete_user(current_user)  # Delete the current user
-        self.app.open_login_page()  # Open the login page after deleting the user
+        if self.checkbox1_var.get() and not self.checkbox2_var.get():
+            self.popup_frame.destroy()
+            current_user = self.username  # Get the username of the current user
+            self.user_manager.delete_user(current_user)  # Delete the current user
+            self.app.open_login_page()  # Open the login page after deleting the user
+        else:
+            self.popup_frame.destroy()
 
     def reset_plot(self):
         self.y_values.clear()  # Clear existing y-values
@@ -629,19 +709,89 @@ class MainPage:
             self.show_edit_frame() # Call the function to show the parameter editing frame
 
     def show_electrogram(self):
+        # Create a figure and axis for the atrial plot
+        self.fig_atrial = Figure(figsize=(3, 2.5), dpi=100)
+        self.ax_atrial = self.fig_atrial.add_subplot(111)
+        self.ax_atrial.set_title("Atrial Electrogram")
+        self.ax_atrial.set_xlabel("Time (ms)")
+        self.ax_atrial.set_ylabel("Amplitude (V)")
+        self.line_atrial, = self.ax_atrial.plot(self.x_values, self.y_values)
+
+        # Create a figure and axis for the ventricular plot
+        self.fig_ventricular = Figure(figsize=(3, 2.5), dpi=100)
+        self.ax_ventricular = self.fig_ventricular.add_subplot(111)
+        self.ax_ventricular.set_title("Ventricular Electrogram")
+        self.ax_ventricular.set_xlabel("Time (ms)")
+        self.ax_ventricular.set_ylabel("Amplitude (V)")
+        self.line_ventricular, = self.ax_ventricular.plot(self.x_values, self.y_values)
+
+        # Create the canvas for the atrial plot
+        self.canvas_atrial = FigureCanvasTkAgg(self.fig_atrial, master=self.electrogram_frame)
+        self.canvas_atrial.get_tk_widget().pack(side="top", fill="both", expand=True)
+
+        # Create the canvas for the ventricular plot
+        self.canvas_ventricular = FigureCanvasTkAgg(self.fig_ventricular, master=self.electrogram_frame)
+        self.canvas_ventricular.get_tk_widget().pack(side="top", fill="both", expand=True)
+
+        self.update_plot()
+        # Hide edit frame and show electrogram frame
+        self.edit_frame.grid_forget()  # Remove the edit frame from the grid layout (not destroyed, just hidden)
+
+        # Display electrogram frame with the plot
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")  # Show the electrogram plot frame in a specific grid position
+
+        # Create toggle buttons for Atrial and Ventricular graphs
+        self.toggle_frame = ctk.CTkFrame(self.electrogram_frame, fg_color="transparent")
+        self.toggle_frame.pack(pady=10)
+
+        self.show_atrial = tk.BooleanVar(value=True)
+        self.show_ventricular = tk.BooleanVar(value=True)
+
+        self.atrial_button = ctk.CTkCheckBox(self.toggle_frame, text="Show Atrial", variable=self.show_atrial, command=self.update_plot)
+        self.atrial_button.pack(side="left", padx=10)
+
+        self.ventricular_button = ctk.CTkCheckBox(self.toggle_frame, text="Show Ventricular", variable=self.show_ventricular, command=self.update_plot)
+        self.ventricular_button.pack(side="left", padx=10)
+
+        self.update_plot()  # Call the function to update the plot with new values or refreshed data
         # Hide edit frame and show electrogram frame
         self.edit_frame.grid_forget() # Remove the edit frame from the grid layout (not destroyed, just hidden)
 
         # Display electrogram frame with the plot
-        self.electrogram_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
         self.update_plot() # Call the function to update the plot with new values or refreshed data
 
+    def update_plot(self):
+        # Generate a new random y-value between 0 and 1
+        new_y_value = random.uniform(0, 1)
+
+        # Update the y_values deque
+        self.y_values.append(new_y_value)
+
+        # Shift the x-values to create a moving window effect
+        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
+        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
+
+        # Update the plot data with the new x and y values
+        self.line.set_ydata(self.y_values) # Update the y-data of the plot line
+        self.line.set_xdata(self.x_values) # Update the x-data of the plot line
+
+        # Set x-axis limits to show the last 3000 ms of data
+        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
+        self.ax.set_ylim(0, 1)  # Set Y-axis range
+
+        # Redraw the canvas with the updated plot
+        self.canvas.draw()
+
+        # Schedule the next update after 200 ms
+        self.master.after(200, self.update_plot)
+    
     def show_edit_frame(self):
         # Hide the electrogram frame to make the edit frame visible
         self.electrogram_frame.grid_forget()
 
         # Display the edit frame in the specified grid position with padding
-        self.edit_frame.grid(row=2, column=2, rowspan=8, columnspan=2, padx=10, pady=10, sticky="nsew")
+        self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
 
         # Clear existing widgets in the edit frame before adding new ones (optional for cleanliness)
         for widget in self.edit_frame.winfo_children(): # Iterate through each widget inside the edit frame
@@ -655,8 +805,6 @@ class MainPage:
             widget.destroy() # Remove the widget from the frame (to avoid duplication or clutter)
 
         username_data = self.user_manager.read_user(self.username)
-        
-        # Ensure the selected mode exists in the user data
         if mode not in username_data:
             username_data[mode] = {}
 
@@ -731,7 +879,6 @@ class MainPage:
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3)
             ]
-
         elif mode == "AOOR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AOOR"]["Lower Rate Limit"])
@@ -749,12 +896,11 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-
         elif mode == "VOOR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["VOOR"]["Lower Rate Limit"])
@@ -772,12 +918,11 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Ventricular Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-
         elif mode == "AAIR":
             # Initialize variables for the sliders
             self.lower_rate_limit = tk.DoubleVar(value=username_data["AAIR"]["Lower Rate Limit"])
@@ -805,7 +950,7 @@ class MainPage:
                 ("PVARP", 150, 500, self.pvarp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -836,14 +981,51 @@ class MainPage:
                 ("VRP", 100, 500, self.vrp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
-                  
-        else:
-            variables = []
+
+        # Define a dictionary to map slider values to text labels
+        activity_threshold_labels = {
+            0: "very-low",
+            1: "low",
+            2: "med-low",
+            3: "med",
+            4: "med-high",
+            5: "high",
+            6: "very-high",
+        }
+
+        # Loop through the variable definitions to create labels and sliders
+        for label, min_val, max_val, var, increment in variables:
+            # Create and pack the label for the slider
+            if label == "Activity Threshold":
+                input_label = ctk.CTkLabel(self.edit_frame, text=f"{label}: {activity_threshold_labels[var.get()]}")
+            else:
+                input_label = ctk.CTkLabel(self.edit_frame, text=f"{label}: {var.get()}")
+            input_label.pack(pady=2, padx=2, anchor="w")
+
+            # Calculate the number of steps based on the increment
+            num_steps = int((max_val - min_val) / increment)
+
+            # Create and pack the slider with specified range, default value, and steps
+            slider = ctk.CTkSlider(self.edit_frame, from_=min_val, to=max_val, number_of_steps=num_steps, variable=var)
+            slider.pack(pady=2, padx=2, fill="x")
+
+            # Bind the slider movement event to update the label with the current slider value
+            if label == "Activity Threshold":
+                slider.bind("<B1-Motion>", lambda event, lbl=input_label, lbl_text=label, sldr=slider: self.update_activity_threshold_label(lbl, lbl_text, sldr, activity_threshold_labels, variables))
+            else:
+                slider.bind("<B1-Motion>", lambda event, lbl=input_label, lbl_text=label, sldr=slider: self.update_label_and_print(lbl, lbl_text, sldr))
+
+            # Disable the slider if admin mode is off
+            if not self.admin_mode.get():
+                slider.configure(state="disabled")
+
+    def update_activity_threshold_label(self, label, label_text, slider, labels, variables):
+        label.configure(text=f"{label_text}: {labels[int(slider.get())]}")
 
         # Loop through the variable definitions to create labels and sliders
         for label, min_val, max_val, var, increment in variables:
@@ -868,119 +1050,112 @@ class MainPage:
     def update_label_and_print(self, label, label_text, slider):
         label.configure(text=f"{label_text}: {slider.get():.1f}")  # Update the label text with the slider's current value, formatted to one decimal place
 
+    def update_user_data_check(self):
+         # Create a popup frame and store it as an instance attribute
+        self.popup_frame = ctk.CTkFrame(self.master, corner_radius=10)  
+        self.popup_frame.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
+        # Create BooleanVar for checkboxes
+        self.checkbox1_var = ctk.BooleanVar()
+        self.checkbox2_var = ctk.BooleanVar()
+        self.check = ctk.CTkLabel(self.popup_frame, text="Are you sure you want to save the data?", font=("Arial", 16, "bold"))
+        self.check.pack(pady=10, padx=10)
+        # Create checkboxes
+        self.checkbox1 = ctk.CTkCheckBox(self.popup_frame, text="Yes", variable=self.checkbox1_var, command=self.update_user_data)
+        self.checkbox1.pack(side="left", pady=10, padx=(50, 10))
+
+        self.checkbox2 = ctk.CTkCheckBox(self.popup_frame, text="No", variable=self.checkbox2_var, command=self.update_user_data)
+        self.checkbox2.pack(side="right", pady=10, padx=10)
+
     def update_user_data(self):
-        username_data = self.user_manager.read_user(self.username)
-        if self.initial_state.get() == "AOO":
-            username_data["AOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
-            username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+        if self.checkbox1_var.get() and not self.checkbox2_var.get():
+            self.popup_frame.destroy()
+            username_data = self.user_manager.read_user(self.username)
+            if self.initial_state.get() == "AOO":
+                username_data["AOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
 
-        elif self.initial_state.get() == "VOO":
-            username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["VOO"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
-            username_data["VOO"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+            elif self.initial_state.get() == "VOO":
+                username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VOO"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VOO"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
 
-        elif self.initial_state.get() == "AAI":
-            username_data["AAI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["AAI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["AAI"]["Atrial Amplitude"] = self.atrial_amplitude.get()
-            username_data["AAI"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-            username_data["AAI"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
-            username_data["AAI"]["ARP"] = self.arp.get()
-            username_data["AAI"]["Hysteresis"] = self.hysteresis.get()
-            username_data["AAI"]["Rate Smoothing"] = self.rate_smoothing.get()
+            elif self.initial_state.get() == "AAI":
+                username_data["AAI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AAI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AAI"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AAI"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                username_data["AAI"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
+                username_data["AAI"]["ARP"] = self.arp.get()
+                username_data["AAI"]["Hysteresis"] = self.hysteresis.get()
+                username_data["AAI"]["Rate Smoothing"] = self.rate_smoothing.get()
 
-        elif self.initial_state.get() == "VVI":
-            username_data["VVI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["VVI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["VVI"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
-            username_data["VVI"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-            username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
-            username_data["VVI"]["VRP"] = self.vrp.get()
-            username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
-        
-        elif self.initial_state.get() == "AOOR":
-            username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["AOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["AOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
-            username_data["AOOR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
-            username_data["AOOR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-            username_data["AOOR"]["Activity Threshold"] = self.activity_threshold.get()
-            username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
-            username_data["AOOR"]["Response Factor"] = self.response_factor.get()
-            username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "VVI":
+                username_data["VVI"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VVI"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VVI"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VVI"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+                username_data["VVI"]["Ventricular Sensitivity"] = self.ventrical_sensitivity.get()
+                username_data["VVI"]["VRP"] = self.vrp.get()
+                username_data["VVI"]["Hysteresis"] = self.hysteresis.get()
 
-        elif self.initial_state.get() == "VOOR":
-            username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["VOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["VOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
-            username_data["VOOR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
-            username_data["VOOR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-            username_data["VOOR"]["Activity Threshold"] = self.activity_threshold.get()
-            username_data["VOOR"]["Reaction Time"] = self.reaction_time.get()
-            username_data["VOOR"]["Response Factor"] = self.response_factor.get()
-            username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
-
-        elif self.initial_state.get() == "AAIR":
-            username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["AAIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["AAIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
-            username_data["AAIR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
-            username_data["AAIR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-            username_data["AAIR"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
-            username_data["AAIR"]["ARP"] = self.arp.get()
-            username_data["AAIR"]["PVARP"] = self.pvarp.get()
-            username_data["AAIR"]["Hysteresis"] = self.hysteresis.get()
-            username_data["AAIR"]["Rate Smoothing"] = self.rate_smoothing.get()
-            username_data["AAIR"]["Activity Threshold"] = self.activity_threshold.get()
-            username_data["AAIR"]["Reaction Time"] = self.reaction_time.get()
-            username_data["AAIR"]["Response Factor"] = self.response_factor.get()
-            username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
-
-        elif self.initial_state.get() == "VVIR":
-            username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
-            username_data["VVIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
-            username_data["VVIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
-            username_data["VVIR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
-            username_data["VVIR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
-            username_data["VVIR"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
-            username_data["VVIR"]["VRP"] = self.vrp.get()
-            username_data["VVIR"]["Hysteresis"] = self.hysteresis.get()
-            username_data["VVIR"]["Rate Smoothing"] = self.rate_smoothing.get()
-            username_data["VVIR"]["Activity Threshold"] = self.activity_threshold.get()
-            username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
-            username_data["VVIR"]["Response Factor"] = self.response_factor.get()
-            username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "AOOR":
+                username_data["AOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["AOOR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AOOR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                username_data["AOOR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["AOOR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["AOOR"]["Response Factor"] = self.response_factor.get()
+                username_data["AOOR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "VOOR":
+                username_data["VOOR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VOOR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VOOR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["VOOR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VOOR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+                username_data["VOOR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["VOOR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["VOOR"]["Response Factor"] = self.response_factor.get()
+                username_data["VOOR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "AAIR":
+                username_data["AAIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["AAIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["AAIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["AAIR"]["Atrial Amplitude"] = self.atrial_amplitude.get()
+                username_data["AAIR"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
+                username_data["AAIR"]["Atrial Sensitivity"] = self.atrial_sensitivity.get()
+                username_data["AAIR"]["ARP"] = self.arp.get()
+                username_data["AAIR"]["PVARP"] = self.pvarp.get()
+                username_data["AAIR"]["Hysteresis"] = self.hysteresis.get()
+                username_data["AAIR"]["Rate Smoothing"] = self.rate_smoothing.get()
+                username_data["AAIR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["AAIR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["AAIR"]["Response Factor"] = self.response_factor.get()
+                username_data["AAIR"]["Recovery Time"] = self.recovery_time.get()
+            elif self.initial_state.get() == "VVIR":
+                username_data["VVIR"]["Lower Rate Limit"] = self.lower_rate_limit.get()
+                username_data["VVIR"]["Upper Rate Limit"] = self.upper_rate_limit.get()
+                username_data["VVIR"]["Max Sensor Rate"] = self.max_sensor_rate.get()
+                username_data["VVIR"]["Ventricular Amplitude"] = self.ventricular_amplitude.get()
+                username_data["VVIR"]["Ventricular Pulse Width"] = self.ventricular_pulse_width.get()
+                username_data["VVIR"]["Ventricular Sensitivity"] = self.ventricular_sensitivity.get()
+                username_data["VVIR"]["VRP"] = self.vrp.get()
+                username_data["VVIR"]["Hysteresis"] = self.hysteresis.get()
+                username_data["VVIR"]["Rate Smoothing"] = self.rate_smoothing.get()
+                username_data["VVIR"]["Activity Threshold"] = self.activity_threshold.get()
+                username_data["VVIR"]["Reaction Time"] = self.reaction_time.get()
+                username_data["VVIR"]["Response Factor"] = self.response_factor.get()
+                username_data["VVIR"]["Recovery Time"] = self.recovery_time.get()
+                
+            username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
+            self.user_manager.update_user_data(self.username, username_data)
+        else:
+            self.popup_frame.destroy()
        
-        username_data["password"] = self.user_manager._encrypt_password(username_data["password"])
-        self.user_manager.update_user_data(self.username, username_data)
-    def update_plot(self):
-        # Generate a new random y-value between 0 and 1
-        new_y_value = random.uniform(0, 1)
-
-        # Update the y_values deque
-        self.y_values.append(new_y_value)
-
-        # Shift the x-values to create a moving window effect
-        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
-        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
-
-        # Update the plot data with the new x and y values
-        self.line.set_ydata(self.y_values) # Update the y-data of the plot line
-        self.line.set_xdata(self.x_values) # Update the x-data of the plot line
-
-        # Set x-axis limits to show the last 3000 ms of data
-        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
-        self.ax.set_ylim(0, 1)  # Set Y-axis range
-
-        # Redraw the canvas with the updated plot
-        self.canvas.draw()
-
-        # Schedule the next update after 200 ms
-        self.master.after(200, self.update_plot)
-        
 class App:
     def __init__(self, root):
         self.root = root  # Store the root window (Tkinter root) in self.root
@@ -993,7 +1168,7 @@ class App:
         self.main_page = None
 
         self.open_login_page()  # Open the login page as the default page when the app starts
-
+        #self.open_main_page("aidan")  # Open the main page as the default page when the app starts
     def open_login_page(self, success_message=False):
         self.clear_page()  # Clear any existing widgets from the root window
         self.login_page = LoginPage(self.root, self.user_manager, self, success_message)  # Initialize and display the LoginPage, passing the root, user manager, app instance, and optional success message

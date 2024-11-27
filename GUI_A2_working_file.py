@@ -75,10 +75,10 @@ class UserManager:
             "VOO": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1},
             "AAI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12},
             "VVI": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12},
-            "AOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
-            "VOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
-            "AAIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "PVARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
-            "VVIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 2.5, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "AOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "VOOR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "AAIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Atrial Amplitude": 3.5, "Atrial Pulse Width": 1, "Atrial Sensitivity": 2.5, "ARP": 250, "PVARP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
+            "VVIR": {"Lower Rate Limit": 60, "Upper Rate Limit": 120, "Max Sensor Rate": 175, "Ventricular Amplitude": 3.5, "Ventricular Pulse Width": 1, "Ventricular Sensitivity": 2.5, "VRP": 250, "Hysteresis": 3.0, "Rate Smoothing": 12, "Activity Threshold": 4.0, "Reaction Time": 10, "Response Factor": 8, "Recovery Time": 2},
             # You can add more user-specific data here
         }
 
@@ -851,7 +851,7 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Atrial Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
                 ("Atrial Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -873,7 +873,7 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Ventricular Amplitude", 0.5, 5.0, self.atrial_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.atrial_pulse_width, 1),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -905,7 +905,7 @@ class MainPage:
                 ("PVARP", 150, 500, self.pvarp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
-                ("Activity Threshold", 0, 5.0, self.activity_threshold, 0.5),
+                ("Activity Threshold", 0, 6.0, self.activity_threshold, 1.0),
                 ("Reaction Time", 10, 50, self.reaction_time, 5),
                 ("Response Factor", 1, 16, self.response_factor, 1),
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
@@ -931,7 +931,7 @@ class MainPage:
                 ("Max Sensor Rate", 50, 175, self.max_sensor_rate, 5),
                 ("Ventricular Amplitude", 0.5, 5.0, self.ventricular_amplitude, 0.5),
                 ("Ventricular Pulse Width", 1, 30, self.ventricular_pulse_width, 1),
-                ("Ventricular Sensitivity", 0, 5.0, self.ventricular_sensitivity, 0.5),
+                ("Ventricular Sensitivity", 0, 6.0, self.ventricular_sensitivity, 1.0),
                 ("VRP", 100, 500, self.vrp, 10),
                 ("Hysteresis", 0.5, 5.0, self.hysteresis, 0.5),
                 ("Rate Smoothing", 3, 24, self.rate_smoothing, 3),
@@ -941,8 +941,45 @@ class MainPage:
                 ("Recovery Time", 2, 16, self.recovery_time, 1)
             ]
             
-        else:
-            variables = []
+        # Define a dictionary to map slider values to text labels
+        activity_threshold_labels = {
+            0: "very-low",
+            1: "low",
+            2: "med-low",
+            3: "med",
+            4: "med-high",
+            5: "high",
+            6: "very-high",
+        }
+
+        # Loop through the variable definitions to create labels and sliders
+        for label, min_val, max_val, var, increment in variables:
+            # Create and pack the label for the slider
+            if label == "Activity Threshold":
+                input_label = ctk.CTkLabel(self.edit_frame, text=f"{label}: {activity_threshold_labels[var.get()]}")
+            else:
+                input_label = ctk.CTkLabel(self.edit_frame, text=f"{label}: {var.get()}")
+            input_label.pack(pady=2, padx=2, anchor="w")
+
+            # Calculate the number of steps based on the increment
+            num_steps = int((max_val - min_val) / increment)
+
+            # Create and pack the slider with specified range, default value, and steps
+            slider = ctk.CTkSlider(self.edit_frame, from_=min_val, to=max_val, number_of_steps=num_steps, variable=var)
+            slider.pack(pady=2, padx=2, fill="x")
+
+            # Bind the slider movement event to update the label with the current slider value
+            if label == "Activity Threshold":
+                slider.bind("<B1-Motion>", lambda event, lbl=input_label, lbl_text=label, sldr=slider: self.update_activity_threshold_label(lbl, lbl_text, sldr, activity_threshold_labels, variables))
+            else:
+                slider.bind("<B1-Motion>", lambda event, lbl=input_label, lbl_text=label, sldr=slider: self.update_label_and_print(lbl, lbl_text, sldr))
+
+            # Disable the slider if admin mode is off
+            if not self.admin_mode.get():
+                slider.configure(state="disabled")
+
+    def update_activity_threshold_label(self, label, label_text, slider, labels, variables):
+        label.configure(text=f"{label_text}: {labels[int(slider.get())]}")
 
         # Loop through the variable definitions to create labels and sliders
         for label, min_val, max_val, var, increment in variables:
