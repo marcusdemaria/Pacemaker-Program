@@ -19,11 +19,11 @@ class MainPage:
         self.user_manager = user_manager  # Ensure user_manager is passed to the main page
         self.plot_running = False
         # Set up the serial connection
-        self.ser = serial.Serial(port='COM4', baudrate=115200, timeout=1)
+        self.ser = serial.Serial(port='COM8', baudrate=115200, timeout=1)
         
         #initial graphing data
-        self.y_values_atrial = deque([0] * 30, maxlen=30)  # Y-axis values for the plot
-        self.y_values_ventricular = deque([0] * 30, maxlen=30)
+        self.y_values_atrial = deque([0.5] * 30, maxlen=30)  # Y-axis values for the plot
+        self.y_values_ventricular = deque([0.5] * 30, maxlen=30)
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
 
         # Create a figure and axis for the plot
@@ -266,8 +266,8 @@ class MainPage:
         self.y_values_atrial.clear()  # Clear existing y-values
         self.y_values_ventricular.clear()
         self.x_values.clear()  # Clear existing x-values
-        self.y_values_atrial.extend([0] * 30)  # Reset y-values to 30 zeros
-        self.y_values_ventricular.extend([0] * 30)
+        self.y_values_atrial.extend([0.5] * 30)  # Reset y-values to 30 zeros
+        self.y_values_ventricular.extend([0.5] * 30)
         self.x_values.extend(range(0, 3000, 100))  # Reset x-values from 0 to 3000, with increments of 100
 
         # Update the line data
@@ -341,13 +341,13 @@ class MainPage:
     def choose_plotting_mode(self):
         self.plot_running = True
         if self.initial_graphing_state.get() == "Atrial":
-            self.update_plot_atrial()
+            self.update_plot_atrial(self.initial_state.get())
         elif self.initial_graphing_state.get() == "Ventrical":
-            self.update_plot_ventrical()
+            self.update_plot_ventrical(self.initial_state.get())
         else:
-            self.update_plot_both()
+            self.update_plot_both(self.initial_state.get())
 
-    def update_plot_atrial(self):
+    def update_plot_atrial(self, mode):
         # Label the graph
         self.ax.set_title("Atrial")  # Set the title of the plot
         self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
@@ -356,6 +356,8 @@ class MainPage:
         self.update_legend(["Atrial"])
         if not self.plot_running:
             return
+        if self.initial_graphing_state.get() != "Atrial":
+            return self.choose_plotting_mode()
         #send the data
         if mode == "AOO":
             self.send_packet(1, 1, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
@@ -397,27 +399,203 @@ class MainPage:
         new_y_value = unpacked_data[16]  # Use the unpacked float variable as the new y-value
         print(new_y_value)
         # Update the y_values deque
-        self.y_values.append(new_y_value)
+        self.y_values_atrial.append(new_y_value)
 
         # Shift the x-values to create a moving window effect
         new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
         self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
 
         # Update the plot data with the new x and y values
-        self.line.set_ydata(self.y_values) # Update the y-data of the plot line
-        self.line.set_xdata(self.x_values) # Update the x-data of the plot line
-
+        self.line1.set_ydata(self.y_values_atrial) # Update the y-data of the plot line
+        self.line1.set_xdata(self.x_values) # Update the x-data of the plot line
+        self.line2.set_ydata([])
+        self.line2.set_xdata([])
         # Set x-axis limits to show the last 3000 ms of data
         self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
-        self.ax.set_ylim(0, 1)  # Set Y-axis range
+        self.ax.set_ylim(0.2, 0.8)  # Set Y-axis range
 
         # Redraw the canvas with the updated plot
         self.canvas.draw()
 
         # Schedule the next update after 200 ms
         if self.plot_running:
-            self.master.after(200, lambda: self.update_plot(mode))
+            self.master.after(200, lambda: self.update_plot_atrial(mode))
     
+    def update_plot_ventrical(self, mode):
+        # Label the graph
+        self.ax.set_title("Ventrical")  # Set the title of the plot
+        self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
+        self.ax.set_ylabel("Amplitude (V)")  # Label for the y-axis
+        # Update the legend for Ventricular mode only
+        self.update_legend(["Ventrical"])
+        if not self.plot_running:
+            return
+        
+        if self.initial_graphing_state.get() != "Ventrical":
+            return self.choose_plotting_mode()
+        
+        #send the data
+        if mode == "AOO":
+            self.send_packet(1, 1, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+            print(self.atrial_pulse_width.get())
+        elif mode == "VOO":
+                
+            self.send_packet(1, 1, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+
+        elif mode == "AAI":
+                
+            self.send_packet(1, 1, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+
+        elif mode == "VVI":
+                
+            self.send_packet(1, 1, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+
+        elif mode == "AOOR":
+                
+            self.send_packet(1, 1, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        elif mode == "VOOR":
+            self.send_packet(1, 1, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        elif mode == "AAIR":
+            self.send_packet(1, 1, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        elif mode == "VVIR":
+            self.send_packet(1, 1, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        # recieve the data
+        raw_data = self.ser.read(32)  # Read exactly 32 bytes
+        if len(raw_data) == 32:
+            #unopacking the data
+            format_string = '16Bdd'  # 16 unsigned bytes (B) and 2 double-precision floats (d)
+            unpacked_data = struct.unpack(format_string, raw_data)
+
+        
+        # Generate a new random y-value between 0 and 1
+        new_y_value = unpacked_data[17]  # Use the unpacked float variable as the new y-value
+        print(new_y_value)
+        # Update the y_values deque
+        self.y_values_ventricular.append(new_y_value)
+
+        # Shift the x-values to create a moving window effect
+        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
+        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
+
+        # Update the plot data with the new x and y values
+        self.line2.set_ydata(self.y_values_ventricular) # Update the y-data of the plot line
+        self.line2.set_xdata(self.x_values) # Update the x-data of the plot line
+        self.line1.set_ydata([])
+        self.line1.set_xdata([])
+        # Set x-axis limits to show the last 3000 ms of data
+        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
+        self.ax.set_ylim(0.2, 0.8)  # Set Y-axis range
+
+        # Redraw the canvas with the updated plot
+        self.canvas.draw()
+
+        # Schedule the next update after 200 ms
+        if self.plot_running:
+            self.master.after(200, lambda: self.update_plot_ventrical(mode))
+    
+    def update_plot_both(self, mode):
+        # Label the graph
+        self.ax.set_title("Atrial and Ventrical")  # Set the title of the plot
+        self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
+        self.ax.set_ylabel("Amplitude (V)")  # Label for the y-axis
+        # Update the legend for Ventricular mode only
+        self.update_legend(["Atrial", "Ventrical"])
+        if not self.plot_running:
+            return
+        if self.initial_graphing_state.get() != "Both":
+            return self.choose_plotting_mode()
+        
+        #send the data
+        if mode == "AOO":
+            self.send_packet(1, 1, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+            print(self.atrial_pulse_width.get())
+        elif mode == "VOO":
+                
+            self.send_packet(1, 1, 2, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+
+        elif mode == "AAI":
+                
+            self.send_packet(1, 1, 3, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+
+        elif mode == "VVI":
+                
+            self.send_packet(1, 1, 4, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0, 0)
+
+        elif mode == "AOOR":
+                
+            self.send_packet(1, 1, 5, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        elif mode == "VOOR":
+            self.send_packet(1, 1, 6, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        elif mode == "AAIR":
+            self.send_packet(1, 1, 7, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, int(self.atrial_sensitivity.get()), 0, int(self.arp.get()), 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        elif mode == "VVIR":
+            self.send_packet(1, 1, 8, 0, int(self.ventricular_pulse_width.get()), 0, int(self.ventricular_amplitude.get()), 0, int(self.ventricular_sensitivity.get()), 0, int(self.vrp.get()), int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), int(self.response_factor.get()), int(self.reaction_time.get()), int(self.recovery_time.get()), int(self.activity_threshold.get()))
+
+        # recieve the data
+        raw_data = self.ser.read(32)  # Read exactly 32 bytes
+        if len(raw_data) == 32:
+            #unopacking the data
+            format_string = '16Bdd'  # 16 unsigned bytes (B) and 2 double-precision floats (d)
+            unpacked_data = struct.unpack(format_string, raw_data)
+        
+        # Generate a new random y-value between 0 and 1
+        new_y_value1 = unpacked_data[16]  # Use the unpacked float variable as the new y-value
+        new_y_value2 = unpacked_data[17]
+        print(new_y_value1)
+        print(new_y_value2)
+        # Update the y_values deque
+        self.y_values_ventricular.append(new_y_value1)
+        self.y_values_atrial.append(new_y_value2)
+
+        # Shift the x-values to create a moving window effect
+        new_x_value = self.x_values[-1] + 100  # Increment the last x-value by 100 ms
+        self.x_values.append(new_x_value) # Append the new x-value to the x_values deque
+
+        # Update the plot data with the new x and y values
+        self.line1.set_ydata(self.y_values_atrial) # Update the y-data of the plot line
+        self.line2.set_ydata(self.y_values_ventricular)
+        self.line1.set_xdata(self.x_values) # Update the x-data of the plot line
+        self.line2.set_xdata(self.x_values) # Update the x-data of the plot line
+        # Set x-axis limits to show the last 3000 ms of data
+        self.ax.set_xlim(max(0, new_x_value - 3000), new_x_value)  # Adjust x-limits to show last 3000 ms
+        self.ax.set_ylim(0.2, 0.8)  # Set Y-axis range
+
+        # Redraw the canvas with the updated plot
+        self.canvas.draw()
+
+        # Schedule the next update after 200 ms
+        if self.plot_running:
+            self.master.after(200, lambda: self.update_plot_both(mode))
+
+    def save_graph(self):
+        # Define the folder where you want to save the file
+        folder_name = "graphs"  # Replace with your desired folder name
+        directory = os.path.join(os.getcwd(), folder_name)  # Combine current working directory with folder name
+        
+        # Create the folder if it doesn't exist
+        os.makedirs(directory, exist_ok=True)
+        
+        file_name = self.username
+        if self.initial_graphing_state.get() == "Atrial":
+            file_path = os.path.join(directory, file_name + "_atrial.png")
+        elif self.initial_graphing_state.get() == "Ventrical":
+            file_path = os.path.join(directory, file_name + "_ventrical.png")
+        else:
+            file_path = os.path.join(directory, file_name + "_both.png")
+        
+        
+        
+        # Save the graph
+        self.fig.savefig(file_path)
+        print(f"Graph saved as '{file_path}'")
+        
     def show_edit_frame(self):
         # Hide the electrogram frame to make the edit frame visible
         self.electrogram_frame.grid_forget()
@@ -428,7 +606,7 @@ class MainPage:
 
         for widget in self.electrogram_control_frame.winfo_children(): # Iterate through each widget inside the edit frame
             widget.destroy() # Remove the widget from the frame (to avoid duplication or clutter)
-        self.format = ctk.CTkButton(self.electrogram_control_frame, text="", fg_color="blue") # Create a button to save the graph
+        self.format = ctk.CTkButton(self.electrogram_control_frame, text="", fg_color="transparent") # Create a button to save the graph
         self.format.grid(row=0,column=0, sticky="nsew", pady=1, padx=(10, 1)) # Place the button on the left side of the frame
         
         # Clear existing widgets in the edit frame before adding new ones (optional for cleanliness)
@@ -677,7 +855,7 @@ class MainPage:
                 username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
                 username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-
+                self.send_packet(1, 0, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
             elif self.initial_state.get() == "VOO":
                 username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
                 username_data["VOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()

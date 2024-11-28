@@ -1,0 +1,89 @@
+{
+    "username": "1",
+    "password": "gAAAAABnRo91n6HFmD_UrH8DO97AyK_PIqJR3N33DTUIj2LAP7HLwPtMRnosbEbnIGGn4TRg_WYwiNdQgvk8_16s_l2Eb8DD_w==",
+    "AOO": {
+        "Lower Rate Limit": 60.0,
+        "Upper Rate Limit": 120.0,
+        "Atrial Amplitude": 3.5,
+        "Atrial Pulse Width": 1.0
+    },
+    "VOO": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Ventricular Amplitude": 3.5,
+        "Ventricular Pulse Width": 1
+    },
+    "AAI": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Atrial Amplitude": 3.5,
+        "Atrial Pulse Width": 1,
+        "Atrial Sensitivity": 2.5,
+        "ARP": 250,
+        "Hysteresis": 3.0,
+        "Rate Smoothing": 12
+    },
+    "VVI": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Ventricular Amplitude": 3.5,
+        "Ventricular Pulse Width": 1,
+        "Ventricular Sensitivity": 2.5,
+        "VRP": 250,
+        "Hysteresis": 3.0,
+        "Rate Smoothing": 12
+    },
+    "AOOR": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Max Sensor Rate": 175,
+        "Atrial Amplitude": 3.5,
+        "Atrial Pulse Width": 1,
+        "Activity Threshold": 2.5,
+        "Reaction Time": 10,
+        "Response Factor": 8,
+        "Recovery Time": 2
+    },
+    "VOOR": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Max Sensor Rate": 175,
+        "Ventricular Amplitude": 3.5,
+        "Ventricular Pulse Width": 1,
+        "Activity Threshold": 2.5,
+        "Reaction Time": 10,
+        "Response Factor": 8,
+        "Recovery Time": 2
+    },
+    "AAIR": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Max Sensor Rate": 175,
+        "Atrial Amplitude": 3.5,
+        "Atrial Pulse Width": 1,
+        "Atrial Sensitivity": 2.5,
+        "ARP": 250,
+        "PVARP": 250,
+        "Hysteresis": 3.0,
+        "Rate Smoothing": 12,
+        "Activity Threshold": 2.5,
+        "Reaction Time": 10,
+        "Response Factor": 8,
+        "Recovery Time": 2
+    },
+    "VVIR": {
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
+        "Max Sensor Rate": 175,
+        "Ventricular Amplitude": 3.5,
+        "Ventricular Pulse Width": 1,
+        "Ventricular Sensitivity": 2.5,
+        "VRP": 250,
+        "Hysteresis": 3.0,
+        "Rate Smoothing": 12,
+        "Activity Threshold": 2.5,
+        "Reaction Time": 10,
+        "Response Factor": 8,
+        "Recovery Time": 2
+    }
+}
