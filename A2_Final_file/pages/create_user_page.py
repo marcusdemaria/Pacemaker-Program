@@ -31,9 +31,9 @@ class CreateUserPage:
         connection_status = True  # Need to change this still
         # Load the Pacemaker Icon
         if connection_status==True:
-            pacemaker_icon_path = "icons/connected.png"
+            pacemaker_icon_path = "A2_Final_file/icons/connected.png"
         else:
-            pacemaker_icon_path = "icons/disconnected.png"  # Path to the saved pacemaker icon
+            pacemaker_icon_path = "A2_Final_file/icons/disconnected.png"  # Path to the saved pacemaker icon
         pacemaker_image = Image.open(pacemaker_icon_path).resize((20, 20))  # Resize as needed
         pacemaker_icon = ImageTk.PhotoImage(pacemaker_image)
 
@@ -55,7 +55,7 @@ class CreateUserPage:
         battery_life.pack(side="left", padx=5)
 
         # Load the Battery Icon
-        battery_icon_path = "icons/battery.png"  # Path to the saved battery icon
+        battery_icon_path = "A2_Final_file/icons/battery.png"  # Path to the saved battery icon
         battery_image = Image.open(battery_icon_path).resize((20, 20))  # Resize as needed
         battery_icon = ImageTk.PhotoImage(battery_image)
 
