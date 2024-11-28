@@ -22,19 +22,19 @@ class MainPage:
         self.ser = serial.Serial(port='COM4', baudrate=115200, timeout=1)
         
         #initial graphing data
-        self.y_values = deque([0] * 30, maxlen=30)  # Y-axis values for the plot
+        self.y_values_atrial = deque([0] * 30, maxlen=30)  # Y-axis values for the plot
+        self.y_values_ventricular = deque([0] * 30, maxlen=30)
         self.x_values = deque(range(0, 3000, 100), maxlen=30)  # X-axis values for the plot
 
         # Create a figure and axis for the plot
         self.fig = Figure(figsize=(3, 5), dpi=100)  # Adjust size for better visibility
         self.ax = self.fig.add_subplot(111)
 
-        # Label the graph
-        self.ax.set_title("Electrogram")  # Set the title of the plot
-        self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
-        self.ax.set_ylabel("Amplitude (V)")  # Label for the y-axis
+        
 
-        self.line, = self.ax.plot(self.x_values, self.y_values)  #Plot the initial x and y values (empty or default data)
+        self.line1, = self.ax.plot(self.x_values, self.y_values_atrial, label="Atrial Values")  #Plot the initial x and y values (empty or default data)
+        self.line2, = self.ax.plot(self.x_values, self.y_values_ventricular, label="Ventrical Values")
+       
 
         self.create_top_widgets()
         self.create_widgets() # Call the function to create the interface elements
@@ -46,6 +46,7 @@ class MainPage:
         container_frame.columnconfigure(0, weight=1)
         container_frame.columnconfigure(1, weight=1)
         container_frame.columnconfigure(2, weight=1)
+        
 
         # Left section: Pacemaker Connection
         pacemaker_connection_frame = ctk.CTkFrame(container_frame, fg_color="transparent")
@@ -107,15 +108,19 @@ class MainPage:
         container_frame = ctk.CTkFrame(self.master, fg_color="transparent")
         container_frame.pack(fill="both", expand=True)
         # Setting up the Grid Layout
-        container_frame.columnconfigure((0, 1), weight=1)
-        container_frame.columnconfigure((2, 3), weight=4)
-        container_frame.rowconfigure((0, 1, 2, 3, 4, 5, 6, 7, 8, 9), weight=1)
+        container_frame.columnconfigure(0, weight=1)
+        container_frame.columnconfigure((1, 2, 3), weight=4)
+        container_frame.rowconfigure(0, weight=1)
+        container_frame.rowconfigure((1, 2, 3, 4, 5, 6, 7, 8, 9), weight=4)
 
         #setting up graph area
         # Create a canvas widget to display the matplotlib figure within the tkinter frame.
         self.electrogram_frame = ctk.CTkScrollableFrame(container_frame)
-        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=1, sticky="nsew")
 
+        self.electrogram_control_frame = ctk.CTkFrame(container_frame)
+        
+        self.electrogram_control_frame.grid(row=0, column=1, columnspan=3, padx=10, pady=10, sticky="nsew")
         # Create the canvas for the plot
         self.canvas = FigureCanvasTkAgg(self.fig, master=self.electrogram_frame)
         
@@ -130,7 +135,7 @@ class MainPage:
         #Setting up the rest of the area
 
         select_mode_label = ctk.CTkLabel(container_frame, text="Select Mode", font=("Arial", 16, "bold")) # Create a label for selecting pacemaker modes.
-        select_mode_label.grid(row=0, column=0, pady=1, padx=10, sticky="sw") # Place the mode label in the grid.
+        select_mode_label.grid(row=0, column=0, pady=(10,1), padx=10, sticky="sw") # Place the mode label in the grid.
 
         pacemaker_state_options = ["AOO", "VOO", "AAI", "VVI", "AOOR", "VOOR", "AAIR", "VVIR"] # Define the options for pacemaker modes (AOO, VOO, AAI, VVI)
         self.initial_state = tk.StringVar(value="AOO")  # Initialize the pacemaker mode variable with a default value of "AOO".
@@ -161,10 +166,13 @@ class MainPage:
         self.delete_user_button = delete_user_button # Store the reference to the button in self.delete_user_button for later use
         self.delete_user_button.configure(state="disabled")
         
-
+        
+        
+        
         # Initialize by hiding the electrogram frame
         self.electrogram_frame.grid_forget()
-        self.show_edit_frame() 
+        self.electrogram_control_frame.configure(fg_color="transparent")
+        self.show_edit_frame()
 
 
     def toggle_admin_mode(self):
@@ -223,7 +231,7 @@ class MainPage:
             self.incorrect_password.place(relx=0.5, rely=0.5, anchor="center")  # Center the popup frame
             self.master.after(3000, lambda: self.incorrect_password.destroy())
             
-        
+
         
 
         # Update the frame with the new admin state
@@ -255,15 +263,24 @@ class MainPage:
             self.popup_frame.destroy()
 
     def reset_plot(self):
-        self.y_values.clear()  # Clear existing y-values
+        self.y_values_atrial.clear()  # Clear existing y-values
+        self.y_values_ventricular.clear()
         self.x_values.clear()  # Clear existing x-values
-        self.y_values.extend([0] * 30)  # Reset y-values to 30 zeros
+        self.y_values_atrial.extend([0] * 30)  # Reset y-values to 30 zeros
+        self.y_values_ventricular.extend([0] * 30)
         self.x_values.extend(range(0, 3000, 100))  # Reset x-values from 0 to 3000, with increments of 100
 
         # Update the line data
-        self.line.set_ydata(self.y_values) # Set the y-data of the plot line to the new y-values
-        self.line.set_xdata(self.x_values) # Set the x-data of the plot line to the new x-values
-
+        if self.initial_graphing_state.get() == "Atrial":
+            self.line1.set_ydata(self.y_values_atrial)  # Set the y-data of the plot line to the new y-values
+        elif self.initial_graphing_state.get() == "Ventrical":
+            self.line2.set_ydata(self.y_values_ventricular)
+        else:
+            self.line1.set_ydata(self.y_values_atrial)
+            self.line2.set_ydata(self.y_values_ventricular)
+        
+        self.line1.set_xdata(self.x_values) # Set the x-data of the plot line to the new x-values
+        self.line2.set_xdata(self.x_values) # Set the x-data of the plot line to the new x-values
         # Reset axis limits
         self.ax.set_xlim(0, 3000) # Show x-axis limits
         self.ax.set_ylim(0, 1) # Show y-axis limits
@@ -273,8 +290,10 @@ class MainPage:
 
     def segment_button_callback(self, value): 
         if value == "Show Electrogram":
+            
             self.show_electrogram() # Call the function to show the electrogram frame
             self.reset_plot() # Reset the plot when electrogram is shown
+
         elif value == "Edit Parameters":
             self.show_edit_frame() # Call the function to show the parameter editing frame
     def send_packet(self, sync, command, mode, apw, vpw, a_amp, v_amp, a_sens, v_sens, arp, vrp, url, lrl, res_factor, rxn_time, rec_time, thresh):
@@ -287,13 +306,54 @@ class MainPage:
     def show_electrogram(self):
         # Hide edit frame and show electrogram frame
         self.edit_frame.grid_forget() # Remove the edit frame from the grid layout (not destroyed, just hidden)
-        
-        # Display electrogram frame with the plot
-        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
         self.plot_running = True
-        self.update_plot(self.initial_state.get()) # Call the function to update the plot with new values or refreshed data
+        # Display electrogram frame with the plot
 
-    def update_plot(self, mode):
+        
+
+        for widget in self.electrogram_control_frame.winfo_children(): # Iterate through each widget inside the edit frame
+            widget.destroy() # Remove the widget from the frame (to avoid duplication or clutter)
+        self.electrogram_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew") # Show the electrogram plot frame in a specific grid position
+        self.electrogram_control_frame.grid(row=0, column=1, columnspan=3, padx=10, pady=10, sticky="nsew")
+        
+        #stuff that goes in the electrogram control frame
+        graphing_state_options = ["Atrial", "Ventrical", "Both"] 
+        self.initial_graphing_state = tk.StringVar(value="Atrial")  # Initialize the pacemaker mode variable with a default value of "AOO".
+        graphing_state_optionmenu = ctk.CTkOptionMenu(self.electrogram_control_frame, values=graphing_state_options, variable=self.initial_graphing_state) # Create an option menu for selecting the pacemaker mode.
+        
+        graphing_state_optionmenu.grid(row=0, column=0, sticky="new", pady=1, padx=(10, 1)) # Place the option menu in the grid.
+
+        self.start_button = ctk.CTkButton(self.electrogram_control_frame, text="Start", font=("Arial", 12, "bold"), command=self.choose_plotting_mode) # Create a button to start the plot
+        self.start_button.grid(row=0, column=1, sticky="nesw", pady=1, padx=(10, 1))
+
+        self.stop_button = ctk.CTkButton(self.electrogram_control_frame, text="Stop", font=("Arial", 12, "bold"), command=self.stop_plot) # Create a button to stop the plot
+        self.stop_button.grid(row=0, column=2, sticky="nesw", pady=1, padx=(10, 1))
+
+        self.save_graph_button = ctk.CTkButton(self.electrogram_control_frame, text="Save Graph", font=("Arial", 12, "bold"), command=self.save_graph) # Create a button to save the graph
+        self.save_graph_button.grid(row=0, column=3, sticky="nesw", pady=1, padx=(10, 1))
+    
+    def update_legend(self, labels):
+        self.ax.legend(labels=labels, loc="upper right")  # Dynamically update the legend
+
+    def stop_plot(self):
+        self.plot_running = False
+
+    def choose_plotting_mode(self):
+        self.plot_running = True
+        if self.initial_graphing_state.get() == "Atrial":
+            self.update_plot_atrial()
+        elif self.initial_graphing_state.get() == "Ventrical":
+            self.update_plot_ventrical()
+        else:
+            self.update_plot_both()
+
+    def update_plot_atrial(self):
+        # Label the graph
+        self.ax.set_title("Atrial")  # Set the title of the plot
+        self.ax.set_xlabel("Time (ms)")   # Label for the x-axis
+        self.ax.set_ylabel("Amplitude (V)")  # Label for the y-axis
+        # Update the legend for Atrial mode only
+        self.update_legend(["Atrial"])
         if not self.plot_running:
             return
         #send the data
@@ -361,10 +421,16 @@ class MainPage:
     def show_edit_frame(self):
         # Hide the electrogram frame to make the edit frame visible
         self.electrogram_frame.grid_forget()
+        self.electrogram_control_frame.configure(fg_color="transparent")
         self.plot_running = False
         # Display the edit frame in the specified grid position with padding
         self.edit_frame.grid(row=1, column=1, rowspan=9, columnspan=3, padx=10, pady=10, sticky="nsew")
 
+        for widget in self.electrogram_control_frame.winfo_children(): # Iterate through each widget inside the edit frame
+            widget.destroy() # Remove the widget from the frame (to avoid duplication or clutter)
+        self.format = ctk.CTkButton(self.electrogram_control_frame, text="", fg_color="blue") # Create a button to save the graph
+        self.format.grid(row=0,column=0, sticky="nsew", pady=1, padx=(10, 1)) # Place the button on the left side of the frame
+        
         # Clear existing widgets in the edit frame before adding new ones (optional for cleanliness)
         for widget in self.edit_frame.winfo_children(): # Iterate through each widget inside the edit frame
             widget.destroy() # Remove the widget from the frame
@@ -611,8 +677,6 @@ class MainPage:
                 username_data["AOO"]["Upper Rate Limit"] = self.upper_rate_limit.get()
                 username_data["AOO"]["Atrial Amplitude"] = self.atrial_amplitude.get()
                 username_data["AOO"]["Atrial Pulse Width"] = self.atrial_pulse_width.get()
-                print(int(self.atrial_pulse_width.get()))
-                self.send_packet(1, 0, 1, int(self.atrial_pulse_width.get()), 0, int(self.atrial_amplitude.get()), 0, 0, 0, 0, 0, int(self.upper_rate_limit.get()), int(self.lower_rate_limit.get()), 0, 0, 0, 0)
 
             elif self.initial_state.get() == "VOO":
                 username_data["VOO"]["Lower Rate Limit"] = self.lower_rate_limit.get()
