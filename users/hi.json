@@ -1,11 +1,11 @@
 {
-    "username": "aidan",
-    "password": "gAAAAABnRTvwmm6XByd2yCEkBuxCKJS9WjyAX7bibvWjrSAuqqyDDLUjEMDhCWhNsnk8Lyin9VyfUMtZsnpWMTjUD9CYeaO_HA==",
+    "username": "hi",
+    "password": "gAAAAABnRjUV19hG0xCYtw4u8w3vgDZLoDElhLDZTLSjEvjCInI_33-6JWfeP8clt39gBXsSsUozRt8iQDbsQ7w4bnzzrNbcaw==",
     "AOO": {
-        "Lower Rate Limit": 90.0,
-        "Upper Rate Limit": 120.0,
+        "Lower Rate Limit": 60,
+        "Upper Rate Limit": 120,
         "Atrial Amplitude": 3.5,
-        "Atrial Pulse Width": 8.0
+        "Atrial Pulse Width": 1
     },
     "VOO": {
         "Lower Rate Limit": 60,
@@ -39,7 +39,7 @@
         "Max Sensor Rate": 175,
         "Atrial Amplitude": 3.5,
         "Atrial Pulse Width": 1,
-        "Activity Threshold": 2.5,
+        "Activity Threshold": 4.0,
         "Reaction Time": 10,
         "Response Factor": 8,
         "Recovery Time": 2
@@ -50,7 +50,7 @@
         "Max Sensor Rate": 175,
         "Ventricular Amplitude": 3.5,
         "Ventricular Pulse Width": 1,
-        "Activity Threshold": 2.5,
+        "Activity Threshold": 4.0,
         "Reaction Time": 10,
         "Response Factor": 8,
         "Recovery Time": 2
@@ -65,11 +65,11 @@
         "ARP": 250.0,
         "PVARP": 250.0,
         "Hysteresis": 3.0,
-        "Rate Smoothing": 12.0,
-        "Activity Threshold": 2.5,
-        "Reaction Time": 10.0,
-        "Response Factor": 8.0,
-        "Recovery Time": 2.0
+        "Rate Smoothing": 12,
+        "Activity Threshold": 4.0,
+        "Reaction Time": 10,
+        "Response Factor": 8,
+        "Recovery Time": 2
     },
     "VVIR": {
         "Lower Rate Limit": 60,
@@ -81,7 +81,7 @@
         "VRP": 250,
         "Hysteresis": 3.0,
         "Rate Smoothing": 12,
-        "Activity Threshold": 2.5,
+        "Activity Threshold": 4.0,
         "Reaction Time": 10,
         "Response Factor": 8,
         "Recovery Time": 2
