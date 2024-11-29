@@ -1,8 +1,8 @@
 # managers/user_manager.py
-import os
-import json
-import re
-from cryptography.fernet import Fernet
+import os  # Provides functions for interacting with the operating system
+import json  # Provides functions for working with JSON data
+import re  # Provides functions for working with regular expressions
+from cryptography.fernet import Fernet  # Provides functions for symmetric encryption and decryption
 
 
 class UserManager:

@@ -1,4 +1,3 @@
-# app.py
 from pages.login_page import LoginPage
 from pages.create_user_page import CreateUserPage
 from pages.main_page import MainPage

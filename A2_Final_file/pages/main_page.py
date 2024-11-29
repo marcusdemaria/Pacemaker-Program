@@ -1,14 +1,14 @@
 # pages/main_page.py
-import customtkinter as ctk
+import customtkinter as ctk  # Import the customtkinter library for creating modern-looking Tkinter GUIs
 import tkinter as tk  # Import the standard Tkinter library for creating GUI applications, as 'tk'
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-from collections import deque
+from matplotlib.figure import Figure  # Import the Figure class from matplotlib to create plots
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg  # Import FigureCanvasTkAgg to embed matplotlib plots in Tkinter
+from collections import deque  # Import deque from collections for efficient appending and popping from both ends
 from PIL import Image, ImageTk  # Import the Image and ImageTk classes from the Pillow library for image processing and display
 from datetime import datetime  # Import the datetime class to handle date and time operations
-import serial
-import struct
-import os
+import serial  # Import the serial library to handle serial communication
+import struct  # Import the struct library to handle binary data packing and unpacking
+import os  # Import the os library for interacting with the operating system
 
 class MainPage:
     def __init__(self, master, app, username, user_manager): # Initialize the main page
